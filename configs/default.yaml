@@ -1,0 +1,23 @@
+dataset:
+  name: OxfordIIITPet
+  target_type: category
+  seed: 42
+  gallery_fraction_of_trainval: 0.5
+  validation_fraction_of_trainval: 0.5
+  final_query_split: test
+
+models:
+  - dino_vit_s16
+  - deit_vit_s16_supervised
+  - dinov2_vit_b14
+  - deit_vit_b16_supervised
+
+retrieval:
+  similarity: cosine
+  exclude_query_from_gallery: true
+  ks: [5, 10]
+
+timing:
+  report_gallery_embedding_seconds: true
+  report_query_embedding_ms: true
+  report_search_ms: true

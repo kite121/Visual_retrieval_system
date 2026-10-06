@@ -1,0 +1,47 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{fontspec}
+\usepackage[russian,english]{babel}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage[table]{xcolor}
+
+\setmainfont{Arial}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.5}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\definecolor{tableline}{HTML}{707070}
+\definecolor{headerbg}{HTML}{E9EEF4}
+
+\begin{document}
+\selectlanguage{russian}
+\arrayrulecolor{tableline}
+
+\begin{tabularx}{\textwidth}{|L{2.5cm}|L{2cm}|L{1.8cm}|Y|}
+\hline
+\multicolumn{4}{|c|}{\rule{0pt}{21pt}\Large\bfseries План проекта P09\rule[-7pt]{0pt}{0pt}} \\
+\hline
+\multicolumn{4}{|c|}{\rule{0pt}{17pt}Visual Similarity Search using Self-Supervised Embeddings\rule[-5pt]{0pt}{0pt}} \\
+\hline
+\multicolumn{4}{|L{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth}|}{\textbf{Цель:} поиск похожих изображений на Oxford-IIIT Pet. \textbf{Сравнение:} DINO и DINOv2 с supervised DeiT. \textbf{Оценка:} Precision@K, Recall@K и время работы. \textbf{Результат:} демо поиска по изображению.} \\
+\hline
+\rowcolor{headerbg}
+\textbf{Этап} & \textbf{Срок} & \textbf{Участник} & \textbf{Результат этапа} \\
+\hline
+1. План проекта & 6 октября & Данил & Документ с исследовательским вопросом, обоснованием выбора Oxford-IIIT Pet, схемой разбиения, определениями метрик, планом замеров времени, ролями и сценарием демо. \\
+\hline
+2. Первые модели & 13 октября & Азамат & Загруженный и разделённый датасет, галерея, работающий поиск на DINO ViT-S/16 и supervised DeiT-S/16, первые метрики и замеры времени. \\
+\hline
+3. Вторые модели & 20 октября & Карим & Работающий поиск на DINOv2 ViT-B/14 и supervised DeiT-B/16; метрики и время на том же разбиении и галерее. \\
+\hline
+4. Проверка прогресса & 27 октября & Аслан & Предварительное сравнение четырёх моделей по Precision, Recall и времени; список оставшихся экспериментов. \\
+\hline
+5. Результаты & 3 ноября & Аслан & Финальные метрики и время работы, таблицы или графики и минимум три примера неудачного поиска с анализом. \\
+\hline
+6. Сдача и демо & 10 ноября & Данил & Двухстраничное техническое резюме, воспроизводимый код, README и окружение, слайды, демо с выбором одной из четырёх моделей и описание вклада участников. \\
+\hline
+\end{tabularx}
+
+\end{document}
