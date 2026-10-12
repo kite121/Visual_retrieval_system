@@ -1,0 +1,63 @@
+{
+  "model": "deit_vit_s16_supervised",
+  "display_name": "DeiT-S/16 (supervised)",
+  "weights_source": "timm deit_small_patch16_224 (supervised ImageNet-1k, head removed)",
+  "embed_dim": 384,
+  "pretrained": true,
+  "dataset_seed": 42,
+  "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
+  "sizes": {
+    "gallery": 1840,
+    "val": 1840,
+    "test": 3669
+  },
+  "batch_size": 64,
+  "num_workers": 2,
+  "precision": "fp32",
+  "hardware": {
+    "device": "cuda",
+    "python": "3.13.15",
+    "torch": "2.11.0+cu130",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "cpu_count": 2,
+    "gpu": "Tesla T4",
+    "cuda": "13.0"
+  },
+  "date": "2026-10-12",
+  "gallery_build_seconds": 17.128636281000013,
+  "metrics": {
+    "val": {
+      "P@5": 0.8882608695652174,
+      "R@5": 0.08934270636420921,
+      "P@10": 0.8691847826086958,
+      "R@10": 0.17487356253938252,
+      "Hit@5": 0.9858695652173913
+    },
+    "test": {
+      "P@5": 0.8665031343690378,
+      "R@5": 0.08716131236643876,
+      "P@10": 0.852739165985282,
+      "R@10": 0.17156631550673287,
+      "Hit@5": 0.9692014172799128
+    }
+  },
+  "query_latency": {
+    "n_queries": 200,
+    "k": 5,
+    "embed_ms": {
+      "median": 8.526635000009719,
+      "mean": 9.145734984999478,
+      "p95": 11.947515649956127
+    },
+    "search_ms": {
+      "median": 0.44987050000599993,
+      "mean": 0.4750038399996015,
+      "p95": 0.5808809999734875
+    },
+    "preprocess_ms": {
+      "median": 11.19378499998902,
+      "mean": 11.019595205003156,
+      "p95": 13.566590100012377
+    }
+  }
+}
