@@ -6,6 +6,19 @@ dataset:
   validation_fraction_of_trainval: 0.5
   final_query_split: test
 
+paths:
+  manifest: configs/split_manifest.csv   # committed; image_id, breed, label, split
+  data_root: data                        # torchvision download location (not in Git)
+  artifacts: artifacts                   # embedding caches (not in Git)
+  results: results/first_models          # metric tables written by scripts/evaluate.py
+
+preprocessing:                           # fixed in code (embeddings.build_transform); listed for the record
+  resize_short_side: 256
+  center_crop: 224
+  interpolation: bicubic
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+
 models:
   - dino_vit_s16
   - deit_vit_s16_supervised
@@ -16,8 +29,16 @@ retrieval:
   similarity: cosine
   exclude_query_from_gallery: true
   ks: [5, 10]
+  hit_ks: [5]
+
+embedding:
+  batch_size: 64        # gallery / query-set extraction
+  num_workers: 2        # Colab has 2 CPU cores
 
 timing:
   report_gallery_embedding_seconds: true
   report_query_embedding_ms: true
   report_search_ms: true
+  n_queries: 200        # single-image queries sampled from the test split (same for all models)
+  n_warmup: 10
+  search_k: 5

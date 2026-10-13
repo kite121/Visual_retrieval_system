@@ -46,6 +46,31 @@ Breed agreement is an operational proxy for visual similarity; it does not captu
 
 ## Getting started
 
-Create a Python environment and install the dependencies in `requirements.txt`. The repository currently contains the agreed **structure and protocol**; model adapters, data preparation, evaluation, and demo are tasks for the upcoming sprints. Downloaded images, model weights, and generated caches belong in `data/` or `artifacts/` and are excluded from Git.
+```bash
+pip install -r requirements.txt
+python scripts/prepare_data.py     # download Oxford-IIIT Pet, write configs/split_manifest.csv (commit it)
+python scripts/evaluate.py         # gallery embeddings, P@K/R@K/Hit@5, timings -> results/first_models/
+python -m pytest tests             # fast checks, no downloads
+```
+
+On Colab use `notebooks/01_first_models_colab.ipynb` (GPU runtime). The first cell mounts Google Drive and unpacks the project from `Visual_retrieval_system.zip` (change `ZIP_PATH` if the archive lives elsewhere), so no `git clone` is needed. Results are written to `results/first_models/`; the split manifest to `configs/split_manifest.csv`. Both must be copied into the repository (download them with the last notebook cell). Downloaded images, model weights, and embedding caches go to `data/` and `artifacts/` (excluded from Git); in Colab they are lost when the session resets.
+
+### Using the shared interface
+
+```python
+from visual_retrieval import data, models, embeddings, retrieval
+
+encoder = models.load_encoder("dino_vit_s16", "cuda")            # frozen, eval mode, returns (B, D) features
+index = retrieval.GalleryIndex(gallery_emb, gallery_ids, gallery_labels, device="cuda")
+hits = retrieval.query("some_image.jpg", encoder, index, k=5)    # [Hit(rank, image_id, breed, score), ...]
+```
+
+`models.available_models()` lists registered encoders. To add a model (DINOv2, DeiT-B/16) register a `ModelSpec` in its adapter module (see `models/__init__.py` and `models/deit.py`); `scripts/evaluate.py` picks it up automatically because its name is already in `configs/default.yaml`.
+
+### Conventions
+
+- Split names in the manifest: `gallery` (first half of trainval), `val` (second half), `test` (official test). Embedding rows follow image-id order within each split.
+- Embeddings are L2-normalized float32; the cache is `artifacts/embeddings/<model>/<split>.npz`. Top-10 rankings for later failure analysis are in `artifacts/runs/<model>/topk_<split>.npz`.
+- Timing is measured with batch size 1 per query (embedding and search separately, medians), after warm-up and with CUDA synchronization; the gallery build time includes loading, preprocessing and the forward pass. Compare models only from runs on the same device.
 
 See [`docs/project_plan.pdf`](docs/project_plan.pdf) for the one-page team plan.

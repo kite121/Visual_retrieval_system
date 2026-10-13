@@ -1,0 +1,63 @@
+{
+  "model": "dino_vit_s16",
+  "display_name": "DINO ViT-S/16",
+  "weights_source": "torch.hub facebookresearch/dino (dino_vits16); fallback timm vit_small_patch16_224.dino",
+  "embed_dim": 384,
+  "pretrained": true,
+  "dataset_seed": 42,
+  "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
+  "sizes": {
+    "gallery": 1840,
+    "val": 1840,
+    "test": 3669
+  },
+  "batch_size": 64,
+  "num_workers": 2,
+  "precision": "fp32",
+  "hardware": {
+    "device": "cuda",
+    "python": "3.13.15",
+    "torch": "2.11.0+cu130",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "cpu_count": 2,
+    "gpu": "Tesla T4",
+    "cuda": "13.0"
+  },
+  "date": "2026-10-12",
+  "gallery_build_seconds": 17.630325754000012,
+  "metrics": {
+    "val": {
+      "P@5": 0.8608695652173913,
+      "R@5": 0.08657425567107752,
+      "P@10": 0.8277717391304349,
+      "R@10": 0.1664963571203529,
+      "Hit@5": 0.9826086956521739
+    },
+    "test": {
+      "P@5": 0.8415917143635868,
+      "R@5": 0.08466122349019004,
+      "P@10": 0.8156173344235487,
+      "R@10": 0.16409176373928053,
+      "Hit@5": 0.9746524938675388
+    }
+  },
+  "query_latency": {
+    "n_queries": 200,
+    "k": 5,
+    "embed_ms": {
+      "median": 7.650679500017077,
+      "mean": 8.65830240999884,
+      "p95": 12.087696299985847
+    },
+    "search_ms": {
+      "median": 0.34578100002136125,
+      "mean": 0.38538985499826595,
+      "p95": 0.535190200051261
+    },
+    "preprocess_ms": {
+      "median": 7.7064294999900085,
+      "mean": 8.471905935003008,
+      "p95": 12.923468550025062
+    }
+  }
+}

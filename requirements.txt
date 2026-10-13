@@ -2,6 +2,9 @@ torch
 torchvision
 timm
 numpy
+pandas
+scikit-learn
 Pillow
 PyYAML
+tqdm
 streamlit
