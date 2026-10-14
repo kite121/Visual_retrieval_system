@@ -1,9 +1,7 @@
 """Supervised DeiT-S/16 and DeiT-B/16 adapters (Azamat and Karim).
 
 Azamat: DeiT-S/16 (``deit_small_patch16_224``, ImageNet-1k supervised, 384-d).
-Karim:  add DeiT-B/16 by calling ``_register_deit`` once more at the bottom of this file
-        (``timm_name="deit_base_patch16_224"``, ``embed_dim=768``, name
-        ``deit_vit_b16_supervised``).
+Karim: DeiT-B/16 (``deit_base_patch16_224.fb_in1k``, ImageNet-1k, 768-d).
 
 ``num_classes=0`` removes the classification head in timm, so ``forward`` returns the
 pooled CLS feature **before** the head (never class logits). We use the non-distilled
@@ -38,4 +36,11 @@ _register_deit(
     display_name="DeiT-S/16 (supervised)",
     timm_name="deit_small_patch16_224",
     embed_dim=384,
+)
+
+_register_deit(
+    name="deit_vit_b16_supervised",
+    display_name="DeiT-B/16 (supervised)",
+    timm_name="deit_base_patch16_224.fb_in1k",
+    embed_dim=768,
 )

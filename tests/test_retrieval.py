@@ -55,9 +55,14 @@ def test_query_end_to_end_with_random_encoder(synthetic_dataset):
     assert query(Image.open(gal.paths[2]), enc, index, k=5, exclude_ids=[gal.image_ids[2]])[0].image_id != gal.image_ids[2]
 
 
-def test_registry_shapes():
-    for name in ("dino_vit_s16", "deit_vit_s16_supervised"):
-        enc = models.load_encoder(name, "cpu", pretrained=False)
+@pytest.mark.parametrize("name", [
+    "dino_vit_s16", "deit_vit_s16_supervised",
+    "dinov2_vit_b14", "deit_vit_b16_supervised",
+])
+def test_registry_shapes(name):
+    enc = models.load_encoder(name, "cpu", pretrained=False)
+    with torch.inference_mode():
         out = enc(torch.zeros(2, 3, 224, 224))
-        assert tuple(out.shape) == (2, models.get_spec(name).embed_dim)
-        assert not any(p.requires_grad for p in enc.parameters()) and not enc.training
+    assert tuple(out.shape) == (2, models.get_spec(name).embed_dim)
+    assert torch.isfinite(out).all()
+    assert not any(p.requires_grad for p in enc.parameters()) and not enc.training
