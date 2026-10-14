@@ -1,0 +1,11 @@
+# Keep Colab's matching CUDA torch/torchvision pair; record it with pip freeze.
+# Install torch and torchvision separately when running outside Colab.
+timm==1.0.30
+numpy==2.5.4
+pandas==3.0.6
+scikit-learn==1.9.1
+Pillow==12.3.0
+PyYAML==6.0.3
+tqdm==4.70.1
+pytest==9.1.1
+nbformat==5.11.1

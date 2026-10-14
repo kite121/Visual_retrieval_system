@@ -1,0 +1,17 @@
+{
+  "hardware": {
+    "device": "cuda",
+    "python": "3.13.15",
+    "torch": "2.11.0+cu130",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "cpu_count": 2,
+    "gpu": "Tesla T4",
+    "cuda": "13.0"
+  },
+  "registered_models": [
+    "deit_vit_s16_supervised",
+    "deit_vit_b16_supervised",
+    "dino_vit_s16",
+    "dinov2_vit_b14"
+  ]
+}

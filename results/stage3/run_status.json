@@ -1,0 +1,17 @@
+{
+  "status": "evaluation_complete",
+  "models": [
+    "dino_vit_s16",
+    "deit_vit_s16_supervised",
+    "dinov2_vit_b14",
+    "deit_vit_b16_supervised"
+  ],
+  "n_models": 4,
+  "gallery_images": 1840,
+  "validation_queries": 1840,
+  "test_queries": 3669,
+  "timing_queries": 200,
+  "timing_repeats_per_model": 3,
+  "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
+  "completed_utc": "2026-10-14T13:50:35.890002+00:00"
+}
