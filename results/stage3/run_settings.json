@@ -1,0 +1,16 @@
+{
+  "models": [
+    "dino_vit_s16",
+    "deit_vit_s16_supervised",
+    "dinov2_vit_b14",
+    "deit_vit_b16_supervised"
+  ],
+  "timing_repeats": 3,
+  "batch_size": 64,
+  "num_workers": 2,
+  "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
+  "source_zip_sha256": "278f1af322776484e92de1609aedcfe422b7ef3bc511fc6f6b4a911ef78eb848",
+  "storage": "colab_vm_download_zip",
+  "precision": "fp32",
+  "created_utc": "2026-10-14T13:36:16.777533+00:00"
+}

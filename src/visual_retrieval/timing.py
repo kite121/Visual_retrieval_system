@@ -9,8 +9,9 @@ Timing rules (identical for every model):
   (batch size 1), and reported as medians;
 * image decoding + preprocessing is reported as a third, separate number and is *not*
   part of the embedding time;
-* the gallery build time covers loading, preprocessing, the forward pass and storing all
-  gallery embeddings (``batch_size`` and ``num_workers`` are recorded with it).
+* gallery build time covers loading, preprocessing, forward passes, normalization
+  and transfer to a host array, with warm file cache; saving to disk is excluded.
+  ``batch_size`` and ``num_workers`` are recorded with it.
 """
 
 from __future__ import annotations
@@ -140,6 +141,8 @@ def measure_query_latency(
     return {
         "n_queries": int(n),
         "k": k,
+        "seed": seed,
+        "query_ids": [queries.image_ids[int(i)] for i in chosen],
         "embed_ms": _summary(emb_ms),
         "search_ms": _summary(search_ms),
         "preprocess_ms": _summary(pre_ms),

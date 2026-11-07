@@ -65,7 +65,20 @@ index = retrieval.GalleryIndex(gallery_emb, gallery_ids, gallery_labels, device=
 hits = retrieval.query("some_image.jpg", encoder, index, k=5)    # [Hit(rank, image_id, breed, score), ...]
 ```
 
-`models.available_models()` lists registered encoders. To add a model (DINOv2, DeiT-B/16) register a `ModelSpec` in its adapter module (see `models/__init__.py` and `models/deit.py`); `scripts/evaluate.py` picks it up automatically because its name is already in `configs/default.yaml`.
+`models.available_models()` lists all four registered encoders. DINOv2 ViT-B/14
+uses Meta's LVD-142M backbone without registers and a pinned Hub code revision;
+DeiT-B/16 uses `deit_base_patch16_224.fb_in1k` with the classifier removed.
+Both return 768-dimensional CLS features and use the shared 224px preprocessing.
+
+### Stage 3 Colab
+
+Use `notebooks/02_second_models_colab.ipynb` with the source ZIP built by
+`python scripts/package_stage3.py`. The notebook defaults to all four models in
+one CUDA session, checks the committed split, runs tests, computes full val/test
+quality and performs three fresh timing repeats. Results, embeddings, rankings,
+logs and environment details are saved on the Colab VM after each model;
+download the results ZIP before ending the runtime. Read
+[`docs/stage3_run_guide.md`](docs/stage3_run_guide.md) for launch and evidence details.
 
 ### Conventions
 
