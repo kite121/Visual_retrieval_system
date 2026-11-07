@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "experiment_id": "01_first_models",
+  "generated_utc": "2026-11-07T15:32:38.175011+00:00",
+  "dataset": {
+    "name": "OxfordIIITPet",
+    "target_type": "category",
+    "seed": 42,
+    "manifest_path": "configs/split_manifest.csv",
+    "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
+    "gallery_fraction_of_trainval": 0.5,
+    "validation_fraction_of_trainval": 0.5,
+    "final_query_split": "test",
+    "sizes": {
+      "gallery": 1840,
+      "validation": 1840,
+      "test": 3669
+    }
+  },
+  "preprocessing": {
+    "resize_short_side": 256,
+    "center_crop": 224,
+    "interpolation": "bicubic",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "retrieval": {
+    "similarity": "cosine",
+    "exclude_query_from_gallery": true,
+    "precision_recall_at_k": [
+      5,
+      10
+    ],
+    "hit_at_k": [
+      5
+    ]
+  },
+  "embedding": {
+    "batch_size": 64,
+    "num_workers": 2,
+    "precision": "fp32"
+  },
+  "timing": {
+    "n_queries": 200,
+    "n_warmup": 10,
+    "search_k": 5,
+    "protocol": {
+      "gallery": "warm file cache; loading, transforms, forward, L2 norm, host transfer; excludes disk save",
+      "embedding": "batch 1; host-to-device transfer, forward and L2 norm; excludes preprocessing",
+      "search": "exact cosine top-5 and transfer of indices to host"
+    }
+  },
+  "environment": {
+    "device": "cuda",
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130",
+    "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+    "cpu_count": 4,
+    "gpu": "Tesla T4",
+    "cuda": "13.0"
+  },
+  "models": [
+    {
+      "model_id": "dino_vit_s16",
+      "display_name": "DINO ViT-S/16",
+      "weights_source": "torch.hub facebookresearch/dino (dino_vits16); fallback timm vit_small_patch16_224.dino",
+      "embedding_dimension": 384,
+      "pretrained": true
+    },
+    {
+      "model_id": "deit_vit_s16_supervised",
+      "display_name": "DeiT-S/16 (supervised)",
+      "weights_source": "timm deit_small_patch16_224 (supervised ImageNet-1k, head removed)",
+      "embedding_dimension": 384,
+      "pretrained": true
+    }
+  ]
+}
