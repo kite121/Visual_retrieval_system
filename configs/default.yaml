@@ -10,7 +10,7 @@ paths:
   manifest: configs/split_manifest.csv   # committed; image_id, breed, label, split
   data_root: data                        # torchvision download location (not in Git)
   artifacts: artifacts                   # embedding caches (not in Git)
-  results: results/first_models          # metric tables written by scripts/evaluate.py
+  results: results/01_first_models       # canonical Stage 2 tables written by scripts/evaluate.py
 
 preprocessing:                           # fixed in code (embeddings.build_transform); listed for the record
   resize_short_side: 256
@@ -22,8 +22,6 @@ preprocessing:                           # fixed in code (embeddings.build_trans
 models:
   - dino_vit_s16
   - deit_vit_s16_supervised
-  - dinov2_vit_b14
-  - deit_vit_b16_supervised
 
 retrieval:
   similarity: cosine
@@ -32,8 +30,8 @@ retrieval:
   hit_ks: [5]
 
 embedding:
-  batch_size: 64        # gallery / query-set extraction
-  num_workers: 2        # Colab has 2 CPU cores
+  batch_size: 64        # gallery / query-set extraction; override on memory-constrained hardware
+  num_workers: 2        # portable notebook default; override from the command line if needed
 
 timing:
   report_gallery_embedding_seconds: true

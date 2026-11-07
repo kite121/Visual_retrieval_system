@@ -3,6 +3,7 @@
     python scripts/evaluate.py                          # all registered models from the config
     python scripts/evaluate.py --models dino_vit_s16    # a single model
     python scripts/evaluate.py --rebuild                # ignore cached embeddings
+    python scripts/evaluate.py --output-format canonical # final Stage 2 file layout
 
 For every model it
 
@@ -10,7 +11,12 @@ For every model it
 2. embeds the validation and test queries,
 3. ranks the gallery by cosine similarity and computes P@5/10, R@5/10, Hit@5 on both query sets,
 4. measures single-query embedding / search latency (batch size 1, fixed query sample),
-5. writes ``results/first_models/<model>.json`` and refreshes ``metrics.csv`` / ``metrics.md``.
+5. writes either the legacy per-model files or the canonical Stage 2 result files.
+
+The default ``legacy`` output is retained for the existing Stage 3 workflow. The
+``canonical`` output writes ``metrics_validation.csv``, ``metrics_test.csv``,
+``runtime_summary.csv``, and ``run_metadata.json`` without placing intermediate
+per-model JSON files in the results directory.
 
 All four planned models are registered. Explicitly requested unknown model names
 are errors; unregistered entries in a custom config are still reported and skipped.
@@ -141,7 +147,11 @@ def evaluate_model(name, cfg, manifest, manifest_sha, args, paths) -> dict:
 
 def write_tables(results_dir: Path) -> None:
     """Aggregate every ``<model>.json`` in ``results_dir`` into ``metrics.csv`` and ``metrics.md``."""
-    runs = [json.loads(p.read_text()) for p in sorted(results_dir.glob("*.json"))]
+    runs = []
+    for path in sorted(results_dir.glob("*.json")):
+        payload = json.loads(path.read_text())
+        if "metrics" in payload and "query_latency" in payload and "display_name" in payload:
+            runs.append(payload)
     if not runs:
         return
     rows, trows = [], []
@@ -178,6 +188,112 @@ def write_tables(results_dir: Path) -> None:
     )
 
 
+def write_canonical_results(results_dir: Path, runs: list[dict], cfg: dict, manifest_path: Path) -> None:
+    """Write the four canonical Stage 2 result files from the completed in-memory runs."""
+    if not runs:
+        return
+
+    results_dir.mkdir(parents=True, exist_ok=True)
+    metric_columns = [
+        "model_id", "model", "precision_at_5", "recall_at_5",
+        "precision_at_10", "recall_at_10", "hit_at_5",
+    ]
+    metric_names = {
+        "precision_at_5": "P@5",
+        "recall_at_5": "R@5",
+        "precision_at_10": "P@10",
+        "recall_at_10": "R@10",
+        "hit_at_5": "Hit@5",
+    }
+    for split, filename in (("val", "metrics_validation.csv"), ("test", "metrics_test.csv")):
+        rows = []
+        for run in runs:
+            values = run["metrics"][split]
+            row = {"model_id": run["model"], "model": run["display_name"]}
+            row.update({column: values[source] for column, source in metric_names.items()})
+            rows.append(row)
+        pd.DataFrame(rows, columns=metric_columns).to_csv(results_dir / filename, index=False)
+
+    runtime_rows = []
+    for run in runs:
+        latency = run["query_latency"]
+        runtime_rows.append({
+            "model_id": run["model"],
+            "model": run["display_name"],
+            "gallery_build_seconds": run["gallery_build_seconds"],
+            "gallery_build_cache_reused": run.get("gallery_build_cache_reused", False),
+            "n_queries": latency["n_queries"],
+            "search_k": latency["k"],
+            "embed_median_ms": latency["embed_ms"]["median"],
+            "embed_mean_ms": latency["embed_ms"]["mean"],
+            "embed_p95_ms": latency["embed_ms"]["p95"],
+            "search_median_ms": latency["search_ms"]["median"],
+            "search_mean_ms": latency["search_ms"]["mean"],
+            "search_p95_ms": latency["search_ms"]["p95"],
+            "preprocess_median_ms": latency["preprocess_ms"]["median"],
+            "preprocess_mean_ms": latency["preprocess_ms"]["mean"],
+            "preprocess_p95_ms": latency["preprocess_ms"]["p95"],
+            "device": run["hardware"]["device"],
+            "gpu": run["hardware"].get("gpu"),
+            "batch_size": run["batch_size"],
+            "date": run["date"],
+        })
+    pd.DataFrame(runtime_rows).to_csv(results_dir / "runtime_summary.csv", index=False)
+
+    first = runs[0]
+    metadata = {
+        "schema_version": 1,
+        "experiment_id": "01_first_models",
+        "generated_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "dataset": {
+            "name": cfg["dataset"]["name"],
+            "target_type": cfg["dataset"]["target_type"],
+            "seed": cfg["dataset"]["seed"],
+            "manifest_path": manifest_path.relative_to(REPO_ROOT).as_posix()
+            if manifest_path.is_relative_to(REPO_ROOT) else str(manifest_path),
+            "manifest_sha256": first["manifest_sha256"],
+            "gallery_fraction_of_trainval": cfg["dataset"]["gallery_fraction_of_trainval"],
+            "validation_fraction_of_trainval": cfg["dataset"]["validation_fraction_of_trainval"],
+            "final_query_split": cfg["dataset"]["final_query_split"],
+            "sizes": {
+                "gallery": first["sizes"]["gallery"],
+                "validation": first["sizes"]["val"],
+                "test": first["sizes"]["test"],
+            },
+        },
+        "preprocessing": cfg["preprocessing"],
+        "retrieval": {
+            "similarity": cfg["retrieval"]["similarity"],
+            "exclude_query_from_gallery": cfg["retrieval"]["exclude_query_from_gallery"],
+            "precision_recall_at_k": cfg["retrieval"]["ks"],
+            "hit_at_k": cfg["retrieval"]["hit_ks"],
+        },
+        "embedding": {
+            "batch_size": first["batch_size"],
+            "num_workers": first["num_workers"],
+            "precision": first["precision"],
+        },
+        "timing": {
+            "n_queries": first["query_latency"]["n_queries"],
+            "n_warmup": cfg["timing"]["n_warmup"],
+            "search_k": first["query_latency"]["k"],
+            "protocol": first["timing_protocol"],
+        },
+        "environment": first["hardware"],
+        "models": [
+            {
+                "model_id": run["model"],
+                "display_name": run["display_name"],
+                "weights_source": run["weights_source"],
+                "embedding_dimension": run["embed_dim"],
+                "pretrained": run["pretrained"],
+            }
+            for run in runs
+        ],
+    }
+    (results_dir / "run_metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", default=str(REPO_ROOT / "configs" / "default.yaml"))
@@ -192,6 +308,12 @@ def main() -> int:
     ap.add_argument("--n-queries", type=int, default=None, help="number of single-image timing queries")
     ap.add_argument("--rebuild", action="store_true", help="recompute embeddings even if cached")
     ap.add_argument("--random-weights", action="store_true", help="smoke test only: skip pretrained weights")
+    ap.add_argument(
+        "--output-format",
+        choices=("legacy", "canonical"),
+        default="legacy",
+        help="legacy keeps Stage 3 per-model JSON files; canonical writes the four Stage 2 files",
+    )
     args = ap.parse_args()
 
     cfg = yaml.safe_load(Path(args.config).read_text())
@@ -222,12 +344,22 @@ def main() -> int:
         sys.exit("no registered models to evaluate")
 
     paths["results"].mkdir(parents=True, exist_ok=True)
+    completed_runs = []
     for name in todo:
         result = evaluate_model(name, cfg, manifest, manifest_sha, args, paths)
-        (paths["results"] / f"{name}.json").write_text(json.dumps(result, indent=2))
+        completed_runs.append(result)
+        if args.output_format == "legacy":
+            (paths["results"] / f"{name}.json").write_text(json.dumps(result, indent=2))
+        else:
+            raw_path = paths["artifacts"] / "runs" / name / "evaluation.json"
+            raw_path.parent.mkdir(parents=True, exist_ok=True)
+            raw_path.write_text(json.dumps(result, indent=2) + "\n")
         if str(args.device).startswith("cuda"):
             torch.cuda.empty_cache()
-    write_tables(paths["results"])
+    if args.output_format == "canonical":
+        write_canonical_results(paths["results"], completed_runs, cfg, paths["manifest"])
+    else:
+        write_tables(paths["results"])
     print(f"\nwrote tables to {paths['results']}")
     return 0
 
