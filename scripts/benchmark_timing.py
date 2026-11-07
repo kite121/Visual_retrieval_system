@@ -38,6 +38,34 @@ def summarize(records: list[dict]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def write_canonical_summary(records: list[dict], destination: Path) -> None:
+    """Export median/min/max across the repeated timing measurements."""
+    if not records:
+        return
+    destination.mkdir(parents=True, exist_ok=True)
+    summary = summarize(records).rename(columns={
+        "model": "model_id",
+        **{f"gallery_build_s_{s}": f"gallery_build_seconds_{s}" for s in ("median", "min", "max")},
+        **{f"{kind}_ms_{s}": f"{kind}_{s}_ms"
+           for kind in ("embed", "search", "preprocess") for s in ("median", "min", "max")},
+    })
+    context = pd.DataFrame([
+        {
+            "model_id": record["model"],
+            "n_queries": record["query_latency"]["n_queries"],
+            "search_k": record["query_latency"]["k"],
+            "device": record["hardware"]["device"],
+            "gpu": record["hardware"].get("gpu"),
+            "batch_size": record["batch_size"],
+            "num_workers": record["num_workers"],
+        }
+        for record in records
+    ]).drop_duplicates("model_id").set_index("model_id")
+    for column in ("n_queries", "search_k", "device", "gpu", "batch_size", "num_workers"):
+        summary[column] = summary["model_id"].map(context[column])
+    summary.to_csv(destination / "runtime_summary.csv", index=False)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--config", default=str(_bootstrap.REPO_ROOT / "configs/default.yaml"))
@@ -49,6 +77,7 @@ def main() -> None:
     ap.add_argument("--num-workers", type=int, default=None)
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--output-dir", default="results/stage3/timing_repeats")
+    ap.add_argument("--summary-dir", default=None, help="also write runtime_summary.csv to this directory")
     args = ap.parse_args()
     if args.repeats < 1:
         ap.error("repeats must be positive")
@@ -99,6 +128,8 @@ def main() -> None:
             if args.device.startswith("cuda"):
                 torch.cuda.empty_cache()
     print(f"completed {len(records)} timing measurements: {dest}")
+    if args.summary_dir:
+        write_canonical_summary(records, resolve(args.summary_dir))
 
 
 if __name__ == "__main__":

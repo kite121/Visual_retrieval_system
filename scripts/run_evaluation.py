@@ -4,6 +4,7 @@
     python scripts/run_evaluation.py --models dino_vit_s16    # a single model
     python scripts/run_evaluation.py --rebuild                # ignore cached embeddings
     python scripts/run_evaluation.py --output-format canonical # final Stage 2 file layout
+    python scripts/run_evaluation.py --no-save-rankings        # disable ranking-array export
 
 For every model it
 
@@ -11,7 +12,7 @@ For every model it
 2. embeds the validation and test queries,
 3. ranks the gallery by cosine similarity and computes P@5/10, R@5/10, Hit@5 on both query sets,
 4. measures single-query embedding / search latency (batch size 1, fixed query sample),
-5. writes either the legacy per-model files or the canonical Stage 2 result files.
+5. writes either the legacy per-model files or the canonical experiment result files.
 
 The default ``legacy`` output is retained for the existing Stage 3 workflow. The
 ``canonical`` output writes ``metrics_validation.csv``, ``metrics_test.csv``,
@@ -106,9 +107,9 @@ def evaluate_model(name, cfg, manifest, manifest_sha, args, paths) -> dict:
         idx_np = idx.cpu().numpy()
         retrieved_labels = gal.labels[idx_np]
         result_metrics[split] = metrics.retrieval_metrics(retrieved_labels, ds.labels, gal.labels, ks, hit_ks)
-        # Save rankings so failed queries can be analysed later without re-running models.
-        np.savez(topk_dir / f"topk_{split}.npz", query_ids=np.asarray(ds.image_ids), query_labels=ds.labels,
-                 gallery_ids=np.asarray(gal.image_ids)[idx_np], scores=scores.cpu().numpy())
+        if args.save_rankings:
+            np.savez(topk_dir / f"topk_{split}.npz", query_ids=np.asarray(ds.image_ids), query_labels=ds.labels,
+                     gallery_ids=np.asarray(gal.image_ids)[idx_np], scores=scores.cpu().numpy())
         print(f"{split:>4}: " + "  ".join(f"{k}={v:.4f}" for k, v in result_metrics[split].items()), flush=True)
 
     t = cfg["timing"]
@@ -188,8 +189,11 @@ def write_tables(results_dir: Path) -> None:
     )
 
 
-def write_canonical_results(results_dir: Path, runs: list[dict], cfg: dict, manifest_path: Path) -> None:
-    """Write the four canonical Stage 2 result files from the completed in-memory runs."""
+def write_canonical_results(
+    results_dir: Path, runs: list[dict], cfg: dict, manifest_path: Path,
+    experiment_id: str = "01_first_models",
+) -> None:
+    """Write the four canonical result files from the completed in-memory runs."""
     if not runs:
         return
 
@@ -243,7 +247,7 @@ def write_canonical_results(results_dir: Path, runs: list[dict], cfg: dict, mani
     first = runs[0]
     metadata = {
         "schema_version": 1,
-        "experiment_id": "01_first_models",
+        "experiment_id": experiment_id,
         "generated_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
         "dataset": {
             "name": cfg["dataset"]["name"],
@@ -308,11 +312,16 @@ def main() -> int:
     ap.add_argument("--n-queries", type=int, default=None, help="number of single-image timing queries")
     ap.add_argument("--rebuild", action="store_true", help="recompute embeddings even if cached")
     ap.add_argument("--random-weights", action="store_true", help="smoke test only: skip pretrained weights")
+    ap.add_argument("--experiment-id", default="01_first_models", help="experiment identifier in canonical metadata")
+    ap.add_argument(
+        "--save-rankings", action=argparse.BooleanOptionalAction, default=True,
+        help="save Top-K ranking arrays; --no-save-rankings disables their export",
+    )
     ap.add_argument(
         "--output-format",
         choices=("legacy", "canonical"),
         default="legacy",
-        help="legacy keeps Stage 3 per-model JSON files; canonical writes the four Stage 2 files",
+        help="legacy keeps per-model JSON files; canonical writes the four standard result files",
     )
     args = ap.parse_args()
 
@@ -357,7 +366,9 @@ def main() -> int:
         if str(args.device).startswith("cuda"):
             torch.cuda.empty_cache()
     if args.output_format == "canonical":
-        write_canonical_results(paths["results"], completed_runs, cfg, paths["manifest"])
+        write_canonical_results(
+            paths["results"], completed_runs, cfg, paths["manifest"], args.experiment_id,
+        )
     else:
         write_tables(paths["results"])
     print(f"\nwrote tables to {paths['results']}")
