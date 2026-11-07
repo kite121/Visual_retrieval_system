@@ -1,7 +1,7 @@
 """Download Oxford-IIIT Pet and write the shared split manifest.
 
-    python scripts/prepare_data.py                 # create configs/split_manifest.csv
-    python scripts/prepare_data.py --check         # verify the committed manifest is reproducible
+    python scripts/prepare_dataset.py                 # create configs/split_manifest.csv
+    python scripts/prepare_dataset.py --check         # verify the committed manifest is reproducible
 
 The manifest (``image_id, breed, label, split``) is committed to Git so the whole team
 uses exactly the same gallery / validation / test partition.
