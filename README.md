@@ -1,89 +1,42 @@
 # Visual Retrieval System
 
-Image search on the [Oxford-IIIT Pet](https://www.robots.ox.ac.uk/~vgg/data/pets/) dataset using pretrained image embeddings. The project compares self-supervised DINO and DINOv2 with supervised DeiT models under one retrieval protocol.
+## Project overview
 
-## Project question
+An image-search system that retrieves the five most visually similar images from the [Oxford-IIIT Pet](https://www.robots.ox.ac.uk/~vgg/data/pets/) dataset. The project compares self-supervised DINO and DINOv2 embeddings with supervised DeiT embeddings using retrieval quality and runtime measurements.
 
-How do retrieval quality and runtime of pretrained DINO and DINOv2 embeddings compare with supervised embeddings on Oxford-IIIT Pet?
+The interface supports image uploads, prepared examples, single-model search, and comparison of all four models.
 
-## Agreed experimental protocol
-
-- Use all 37 breed classes and the official `trainval` and `test` partitions.
-- Split `trainval` 50/50 **within each breed** with seed `42`. Use one half as the fixed gallery and the other as validation queries. Use the official `test` partition only for final queries.
-- A gallery image is relevant when its breed label matches the query breed.
-- Compare DINO ViT-S/16, supervised DeiT-S/16, DINOv2 ViT-B/14, and supervised DeiT-B/16. Use pretrained weights without fine-tuning in the initial comparison.
-- Report Precision@5/10, Recall@5/10, Hit@5, gallery embedding time, and per-query embedding and search time. Record hardware and batch size alongside timing results.
-- The demo accepts a query image, lets the user select a model, and shows the five nearest gallery images.
-
-Breed agreement is an operational proxy for visual similarity; it does not capture every human judgment about appearance.
+![Image-search interface and Top-5 results](demo/screenshot.jpg)
 
 ## Repository layout
 
-| Path | Purpose |
+| Location | Contents |
 | --- | --- |
-| `configs/default.yaml` | Shared split, models, and evaluation settings |
-| `src/visual_retrieval/data.py` | Dataset loading and deterministic split |
-| `src/visual_retrieval/models/` | Pretrained model adapters |
-| `src/visual_retrieval/embeddings.py` | Embedding extraction and normalization |
-| `src/visual_retrieval/retrieval.py` | Gallery indexing and nearest-neighbor search |
-| `src/visual_retrieval/metrics.py` | Retrieval metrics |
-| `src/visual_retrieval/timing.py` | Runtime measurements |
-| `scripts/` | Data preparation and evaluation entry points |
-| `demo/app.py` | Query-by-image demo |
-| `results/` | Final tables, figures, and failure examples |
-| `docs/` | Project plan and documentation |
+| [`demo/`](demo/) | Streamlit interface, prepared examples, screenshot, and setup instructions. |
+| [`notebooks/`](notebooks/) | Three notebooks for model evaluation and final analysis. |
+| [`results/`](results/) | Saved quality metrics, runtime measurements, figures, and failure cases. |
+| [`docs/`](docs/) | Project plan and milestone reports with detailed experimental methodology and findings. |
+| [`configs/`](configs/) | Shared experiment settings and fixed dataset split. |
+| [`scripts/`](scripts/) | Dataset preparation, evaluation, timing, demo preparation, and final-analysis entry points. |
+| [`src/`](src/) | Shared dataset, model, embedding, retrieval, metric, and timing code. |
+| [`requirements.txt`](requirements.txt) | Combined project dependencies. |
 
-## Team and deadlines
+For detailed information about the experiments, see the reports in [`docs/milestones/`](docs/milestones/).
 
-| Date (2026) | Owner | Deliverable |
-| --- | --- | --- |
-| 6 October | Danil | Project plan and shared experiment protocol |
-| 13 October | Azamat | Dataset pipeline, gallery, DINO ViT-S/16 and supervised DeiT-S/16 baselines |
-| 20 October | Karim | DINOv2 ViT-B/14 and supervised DeiT-B/16 using the same gallery and metrics |
-| 27 October | Aslan | Preliminary comparison and remaining experiment list |
-| 3 November | Aslan | Final results, runtimes, figures, and at least three failure examples |
-| 10 November | Danil | Technical summary, reproducible code, README, slides, demo, and contributions |
+## Demo and results
 
-## Getting started
+To run the system and view live retrieval results, follow the step-by-step instructions in [`demo/README.md`](demo/README.md). They cover environment setup, gallery and model preparation, and launching the interface.
 
-```bash
-pip install -r requirements.txt
-python scripts/prepare_data.py     # download Oxford-IIIT Pet, write configs/split_manifest.csv (commit it)
-python scripts/evaluate.py         # gallery embeddings, P@K/R@K/Hit@5, timings -> results/first_models/
-python -m pytest tests             # fast checks, no downloads
-```
+For saved experiment tables, timings, comparison charts, and failure examples, see [`results/README.md`](results/README.md).
 
-On Colab use `notebooks/01_first_models_colab.ipynb` (GPU runtime). The first cell mounts Google Drive and unpacks the project from `Visual_retrieval_system.zip` (change `ZIP_PATH` if the archive lives elsewhere), so no `git clone` is needed. Results are written to `results/first_models/`; the split manifest to `configs/split_manifest.csv`. Both must be copied into the repository (download them with the last notebook cell). Downloaded images, model weights, and embedding caches go to `data/` and `artifacts/` (excluded from Git); in Colab they are lost when the session resets.
+## Reproduce the experiments
 
-### Using the shared interface
+Open a notebook from [`notebooks/`](notebooks/) in Kaggle, Colab, or local Jupyter and run its cells in order. The notebooks download the repository when needed and install dependencies.
 
-```python
-from visual_retrieval import data, models, embeddings, retrieval
+**Internet access must be enabled. A GPU is recommended for model evaluation; notebook 02 requires a CUDA GPU. Notebook 03 runs on CPU.**
 
-encoder = models.load_encoder("dino_vit_s16", "cuda")            # frozen, eval mode, returns (B, D) features
-index = retrieval.GalleryIndex(gallery_emb, gallery_ids, gallery_labels, device="cuda")
-hits = retrieval.query("some_image.jpg", encoder, index, k=5)    # [Hit(rank, image_id, breed, score), ...]
-```
-
-`models.available_models()` lists all four registered encoders. DINOv2 ViT-B/14
-uses Meta's LVD-142M backbone without registers and a pinned Hub code revision;
-DeiT-B/16 uses `deit_base_patch16_224.fb_in1k` with the classifier removed.
-Both return 768-dimensional CLS features and use the shared 224px preprocessing.
-
-### Stage 3 Colab
-
-Use `notebooks/02_second_models_colab.ipynb` with the source ZIP built by
-`python scripts/package_stage3.py`. The notebook defaults to all four models in
-one CUDA session, checks the committed split, runs tests, computes full val/test
-quality and performs three fresh timing repeats. Results, embeddings, rankings,
-logs and environment details are saved on the Colab VM after each model;
-download the results ZIP before ending the runtime. Read
-[`docs/stage3_run_guide.md`](docs/stage3_run_guide.md) for launch and evidence details.
-
-### Conventions
-
-- Split names in the manifest: `gallery` (first half of trainval), `val` (second half), `test` (official test). Embedding rows follow image-id order within each split.
-- Embeddings are L2-normalized float32; the cache is `artifacts/embeddings/<model>/<split>.npz`. Top-10 rankings for later failure analysis are in `artifacts/runs/<model>/topk_<split>.npz`.
-- Timing is measured with batch size 1 per query (embedding and search separately, medians), after warm-up and with CUDA synchronization; the gallery build time includes loading, preprocessing and the forward pass. Compare models only from runs on the same device.
-
-See [`docs/project_plan.pdf`](docs/project_plan.pdf) for the one-page team plan.
+| Notebook | Purpose |
+| --- | --- |
+| [01 — First models](notebooks/01_first_models_colab.ipynb) | Evaluate DINO ViT-S/16 and supervised DeiT-S/16; GPU recommended. |
+| [02 — Second models](notebooks/02_second_models_colab.ipynb) | Compare all four models, repeat timing measurements, and export embeddings; CUDA GPU required. |
+| [03 — Final analysis](notebooks/03_final_analysis.ipynb) | Assemble final tables and charts, validate saved failure cases, and package the results; CPU sufficient. |
