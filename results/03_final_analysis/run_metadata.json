@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "analysis_utc": "2026-11-08T13:31:53.755371+00:00",
+  "analysis_utc": "2026-11-08T13:56:49.954551+00:00",
   "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
   "source_files": [
     {
@@ -364,6 +364,7 @@
   "timing_aggregation": "Copied canonical repeated statistics, not legacy stage3 timings",
   "failure_cases": {
     "status": "complete",
+    "mode": "reuse_saved_cases",
     "selection": {
       "split": "test",
       "k": 5,
@@ -390,9 +391,10 @@
         }
       ]
     },
-    "interpretation": "Diagnostic examples; explanations are hypotheses, not causal findings. Rankings are from a separate verified run, not the canonical timing run.",
-    "metric_tolerance": 1e-06,
-    "test_metric_checks": [
+    "interpretation": "Saved diagnostic examples from the separate 2026-10-31 run. Explanations are hypotheses, not causal findings.",
+    "case_metrics_verified": true,
+    "full_test_rankings_recomputed": false,
+    "historical_test_metric_checks": [
       {
         "model_id": "dino_vit_s16",
         "max_absolute_difference": 0.0,
@@ -450,7 +452,7 @@
         }
       }
     ],
-    "source_files": [
+    "historical_source_files": [
       {
         "path": "results/final_analysis_evidence/selection.json",
         "sha256": "52fbf3a4c1994701828490a4b0d728cbf6d6a0623a56f532957894e6c2d660ba"
@@ -559,7 +561,25 @@
         "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/wheaten_terrier_175.jpg",
         "sha256": "ea539a3ce74d39a4da1b66779bcf9187a90005ee06e9d13dc0d3fe45c56dc32e"
       }
+    ],
+    "source_files": [
+      {
+        "path": "results/03_final_analysis/failure_cases.csv",
+        "sha256": "802aa7931d29fecf8766194852ce4577277c300f94ae5cd1763ca863d0500560"
+      },
+      {
+        "path": "results/03_final_analysis/figures/failure_case_01.png",
+        "sha256": "6869e578de6a4f432809dcd42c17bfb6833c9b668799f415cd481da08ce22d4d"
+      },
+      {
+        "path": "results/03_final_analysis/figures/failure_case_02.png",
+        "sha256": "44451cb4ee32b88925fe0aa29e3064287985872366161cf287ee884cc269f3a3"
+      },
+      {
+        "path": "results/03_final_analysis/figures/failure_case_03.png",
+        "sha256": "f1097dc0984d22a741451580cf5e659a6a8f16891b29bbcafbcbb89330ef8368"
+      }
     ]
   },
-  "analysis_source_commit": "8d431d951c98a9422fda4e6fd6112491368659d5"
+  "analysis_source_commit": "23fa5dffec2c197a01362efa749a714bfa6ee5a4"
 }
