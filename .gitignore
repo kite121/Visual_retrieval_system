@@ -8,6 +8,9 @@ __pycache__/
 .ipynb_checkpoints/
 data/
 artifacts/
+# Saved rankings and selected images required to reproduce notebook 03.
+!/results/final_analysis_evidence/artifacts/
+!/results/final_analysis_evidence/data/
 /demo/embeddings/
 /demo/.cache/
 /demo/demo_script.md

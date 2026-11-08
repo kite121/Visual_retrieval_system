@@ -1,0 +1,9 @@
+{
+  "source": "https://huggingface.co/datasets/timm/oxford-iiit-pet",
+  "revision": "089695c834a7deb60505b7cc506672db1c31a6aa",
+  "mirror_parquet_sha256_verified": true,
+  "all_7349_image_ids_labels_and_official_partitions_match_committed_manifest": true,
+  "all_images_decoded": true,
+  "images_reencoded": false,
+  "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80"
+}

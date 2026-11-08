@@ -1,0 +1,26 @@
+{
+  "split": "test",
+  "k": 5,
+  "selection_method": "Fixed diagnostic examples reviewed in the previous Stage 5 analysis; no model tuning. Three distinct queries across DINO, DINOv2 and DeiT-B. These are illustrative, not a random or representative sample.",
+  "ranking_origin": "Separate full pretrained evaluation on 2026-10-31, GTX 1060 3GB, batch 8. Copied unmodified; full test metrics must agree with canonical 2026-11-07 quality within 1e-6. No timing data from this diagnostic run is used in final runtime_summary.csv.",
+  "cases": [
+    {
+      "query_id": "Abyssinian_21",
+      "observation": "Observed pattern: the query is a sleeping cat photographed closely from the side. Its closed eyes, cheek and muzzle dominate the encoder crop, with little of the upright head outline or body visible. DINO returns two Egyptian Mau images, a Maine Coon, a British Shorthair and a Bengal. Several neighbors also emphasize a cat face rather than a full-body breed profile.",
+      "explanation": "A plausible explanation is reduced access to breed-specific shape cues under this pose and partial view, allowing broad feline facial appearance to dominate the embedding. This is a model-specific difficulty: DINOv2 retrieves five same-breed neighbors for the same query, whereas DINO and DeiT-B retrieve none. The contrast supports using the example to examine representation robustness; it does not prove which feature caused DINO's ranking.",
+      "model_id": "dino_vit_s16"
+    },
+    {
+      "query_id": "Siamese_228",
+      "observation": "Observed pattern: the Siamese-labeled query has a dark face and ears, light surrounding fur and blue eyes. All five DINOv2 neighbors are labeled Birman and show a closely related color-point face pattern. Their cosine similarities are high, including approximately 0.904 for rank one, despite zero breed agreement. All four evaluated encoders have P@5 = 0 for this query.",
+      "explanation": "This case illustrates a fine-grained breed boundary where perceptual resemblance and the label-based relevance rule disagree. Similar face markings and fur appearance plausibly make the Birman images strong visual neighbors. Cosine similarity is not a calibrated probability of a correct breed match. The image and inherited annotation would need an independent review before making any claim of a labeling error; the experiment itself establishes only the observed cross-breed retrieval.",
+      "model_id": "dinov2_vit_b14"
+    },
+    {
+      "query_id": "leonberger_73",
+      "observation": "Observed pattern: a Leonberger-labeled dog is running through grass, with a shaggy coat, a dark muzzle and a less conventional pose than a standing breed portrait. DeiT-B returns five Wheaten Terrier images. Several returned dogs share shaggy facial hair, while most backgrounds differ from the query. This does not support a simple claim that matching grass backgrounds alone explain the failure.",
+      "explanation": "A plausible confusion is that shared coat texture and face appearance outweigh breed-specific proportions in this representation. The photograph provides no calibrated body-size cue, and the running pose changes the visible silhouette. On this exact query, DeiT-S and DINOv2 each retrieve five correct-breed neighbors and DINO retrieves four. The larger supervised model therefore has a specific failure that is not shared by all encoders; a better average score does not guarantee better retrieval for every query.",
+      "model_id": "deit_vit_b16_supervised"
+    }
+  ]
+}
