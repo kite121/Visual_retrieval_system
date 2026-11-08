@@ -15,7 +15,7 @@ python -m pip install -r requirements.txt
 python scripts/prepare_demo.py --embeddings-zip /path/to/second_models_embeddings.zip --verify-models
 ```
 
-The preparation command verifies the archive's split manifest, installs gallery embeddings, downloads Oxford-IIIT Pet and pretrained weights, copies four test queries, and checks all 16 query/model combinations. It does not train models or regenerate gallery embeddings.
+The preparation command verifies the archive's split manifest, installs gallery embeddings, downloads Oxford-IIIT Pet and pretrained weights, copies four test queries, and runs all 16 query/model combinations. It records observed results without comparing them with predefined accuracy targets. It does not train models or regenerate gallery embeddings.
 
 If gallery caches have already been installed, omit `--embeddings-zip`. To prepare images and caches without downloading model weights, use `--skip-model-download`; uploaded-image inference still requires the real weights before presentation.
 
@@ -72,8 +72,8 @@ Download assets on the actual presentation machine in advance. Run the preparati
 
 Prepared queries belong to the test split and are disjoint from the gallery. Byte-identical gallery images are excluded if a gallery image is uploaded. Recompression, crops, and near-duplicates are not detected as exact duplicates.
 
-If the installed environment differs from the notebook environment, the verification command explicitly checks whether the prepared-case outcomes still agree. It does not overwrite the recorded experiment metrics.
+The `--verify-models` option checks that each encoder can complete retrieval for the prepared queries and records the observed outputs. The case descriptions contain no expected scores, and the command does not enforce fixed retrieval results or overwrite the recorded experiment metrics.
 
 ## Local verification
 
-Verified on macOS with CPU inference, Python 3.12.3, PyTorch 2.15.0, torchvision 0.29.2, timm 1.0.31, and Streamlit 1.67.0. All 16 prepared query/model combinations reproduced their expected Top-5 breed counts. Streamlit application checks covered all model selections, all four comparison cases, a JPEG upload, a previously unseen cropped PNG, exclusion of an uploaded gallery image, and an invalid-image error. Those application checks also passed with network connections disabled. The running browser interface was checked separately.
+Verified on macOS with CPU inference, Python 3.12.3, PyTorch 2.15.0, torchvision 0.29.2, timm 1.0.31, and Streamlit 1.67.0. All 16 prepared query/model combinations completed live retrieval. Streamlit application checks covered all model selections, all four comparison cases, a JPEG upload, a previously unseen cropped PNG, exclusion of an uploaded gallery image, and an invalid-image error. Those application checks also passed with network connections disabled. The running browser interface was checked separately.
