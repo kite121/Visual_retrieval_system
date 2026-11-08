@@ -18,14 +18,37 @@ import streamlit as st
 from demo import service
 from src import data, models
 
-st.set_page_config(page_title="Visual Similarity Search", page_icon="🔎", layout="wide")
+st.set_page_config(page_title="Image Search", page_icon="🔎", layout="wide")
 st.markdown(
     """<style>
-    .block-container {max-width: 1450px; padding-top: 2rem;}
+    .block-container {max-width: 1200px; padding-top: 1.5rem;}
+    h1 {font-size: 2.2rem !important;}
     [data-testid="stMetric"] {border: 1px solid rgba(128,128,128,.25); padding: 12px; border-radius: 10px;}
+    [data-testid="stMetricValue"] {font-size: 1.6rem;}
+    .st-key-query_preview img {width: 100%; max-height: 220px; object-fit: contain; border-radius: 10px;}
+    .st-key-result_grid img {width: 100%; height: 150px; object-fit: contain; border-radius: 8px;}
     </style>""",
     unsafe_allow_html=True,
 )
+
+MODEL_LABELS = {
+    "dino_vit_s16": "DINO-S",
+    "deit_vit_s16_supervised": "DeiT-S",
+    "dinov2_vit_b14": "DINOv2-B",
+    "deit_vit_b16_supervised": "DeiT-B",
+}
+CASE_HINTS = {
+    "successful_search": "A clear match for every model.",
+    "model_comparison": "Compare how the encoders see the same image.",
+    "shared_failure": "A difficult example with visually similar breeds.",
+    "larger_is_not_always_better": "A larger model can still make mistakes.",
+}
+
+
+def move_result(direction, names):
+    current = st.session_state.get("result_model", names[0])
+    position = names.index(current)
+    st.session_state["result_model"] = names[position + direction]
 
 
 @st.cache_resource(show_spinner=False)
@@ -49,28 +72,28 @@ def asset_status(settings):
 
 
 def render_result(result, query_info, settings):
-    st.subheader(result["display_name"])
+    st.subheader(f"{MODEL_LABELS[result['model_id']]} · Top 5")
     columns = st.columns(4)
     if result["correct"] is not None:
-        columns[0].metric("Precision@5", f"{result['precision_at_5']:.0%}", help="Same-breed results among the five retrieved images.")
+        columns[0].metric("P@5", f"{result['precision_at_5']:.0%}", help="Fraction of Top-5 results with the same breed as the query.")
     else:
-        columns[0].metric("Retrieved images", len(result["hits"]))
-    columns[1].metric("Preprocessing", f"{result['preprocessing_ms']:.1f} ms")
-    columns[2].metric("Embedding", f"{result['embedding_ms']:.1f} ms")
-    columns[3].metric("Search", f"{result['search_ms']:.2f} ms")
-    for column, hit in zip(st.columns(5), result["hits"]):
-        with column:
-            st.image(data.load_image(data.image_path(settings.dataset_root, hit.image_id)), width="stretch")
-            correct = query_info["breed"] and hit.breed == query_info["breed"]
-            marker = ("✅ " if correct else "❌ ") if query_info["breed"] else ""
-            st.markdown(f"**#{hit.rank} · {marker}{hit.breed}**")
-            st.caption(f"Cosine similarity {hit.score:.3f}")
-    st.caption(f"Live processing: {result['total_ms']:.1f} ms · model loading and page rendering excluded")
+        columns[0].metric("Matches", len(result["hits"]))
+    columns[1].metric("Embedding", f"{result['embedding_ms']:.1f} ms")
+    columns[2].metric("Search", f"{result['search_ms']:.2f} ms")
+    columns[3].metric("Total", f"{result['total_ms']:.1f} ms", help="Preprocessing + embedding + search. Model loading is excluded.")
+    with st.container(key="result_grid"):
+        for column, hit in zip(st.columns(5), result["hits"]):
+            with column:
+                st.image(data.load_image(data.image_path(settings.dataset_root, hit.image_id)), width="stretch")
+                correct = query_info["breed"] and hit.breed == query_info["breed"]
+                marker = ("✅ " if correct else "❌ ") if query_info["breed"] else ""
+                st.markdown(f"**{marker}{hit.breed}**")
+                st.caption(f"#{hit.rank} · Similarity {hit.score:.3f}")
 
 
 def main():
-    st.title("Visual Similarity Search")
-    st.markdown("Find similar pets with **DINO, DINOv2 and supervised DeiT embeddings**.")
+    st.title("Image Search")
+    st.caption("Oxford-IIIT Pet · 1,840 gallery images")
     try:
         settings = service.load_settings()
         cases = service.load_cases(settings)
@@ -86,40 +109,35 @@ def main():
                 st.write(item)
         return
 
-    with st.sidebar:
-        st.header("Search settings")
-        mode = st.radio("Mode", ["Single model", "Compare all four"], key="search_mode")
+    controls, model_control = st.columns([3, 2], gap="large")
+    with controls:
+        mode = st.radio("Search mode", ["One model", "Compare 4 models"], horizontal=True, key="search_mode")
+    with model_control:
         selected = st.selectbox(
             "Model", settings.model_ids,
             index=settings.model_ids.index(settings.default_model),
-            format_func=lambda value: models.get_spec(value).display_name,
-            disabled=mode == "Compare all four", key="selected_model",
+            format_func=MODEL_LABELS.get,
+            disabled=mode == "Compare 4 models", key="selected_model",
         )
-        st.divider()
-        st.caption("Oxford-IIIT Pet · 37 breeds")
-        st.caption("Fixed gallery · 1,840 images")
-        st.caption("Top-5 · exact cosine search")
-        st.caption(f"Current device: {settings.device.upper()}")
 
-    source = st.radio("Query source", ["Prepared examples", "Upload an image"], horizontal=True, key="query_source")
+    source = st.radio("Image", ["Example", "Upload"], horizontal=True, key="query_source")
     image_bytes = None
     chosen_case = None
-    if source == "Prepared examples":
+    if source == "Example":
         case_id = st.selectbox(
-            "Prepared example", [case["id"] for case in cases],
+            "Example", [case["id"] for case in cases],
             format_func=lambda value: next(c["title"] for c in cases if c["id"] == value),
             key="prepared_case",
         )
         chosen_case = next(case for case in cases if case["id"] == case_id)
         image_bytes = (settings.cases_path.parent / chosen_case["filename"]).read_bytes()
     else:
-        uploaded = st.file_uploader("Upload a query image", type=["jpg", "jpeg", "png"], key="uploaded_query")
+        uploaded = st.file_uploader("Choose a JPG or PNG", type=["jpg", "jpeg", "png"], key="uploaded_query")
         if uploaded is not None:
             image_bytes = uploaded.getvalue()
-        st.caption("Breed labels evaluate known examples; arbitrary uploads are searched without assuming a breed.")
 
     if image_bytes is None:
-        st.info("Upload an image to search the gallery.")
+        st.info("Choose an image to start.")
         return
     try:
         query_image = service.decode_image(image_bytes)
@@ -127,25 +145,24 @@ def main():
         st.error(str(exc))
         return
     query_info = service.identify_query(image_bytes, settings, cached_signatures(settings))
-    preview, explanation = st.columns([1, 3], gap="large")
+    preview, explanation = st.columns([2, 3], gap="large", vertical_alignment="center")
     with preview:
-        st.image(query_image, caption="Query image", width=240)
+        with st.container(key="query_preview"):
+            st.image(query_image, width="stretch")
     with explanation:
         if chosen_case:
             st.subheader(chosen_case["title"])
-            st.write(chosen_case["description"])
+            st.write(CASE_HINTS[chosen_case["id"]])
         else:
-            st.subheader("Your query")
-            st.write("The selected encoder turns this image into a vector and searches the same fixed gallery.")
+            st.subheader("Your image")
         if query_info["breed"]:
-            st.write(f"Known breed: **{query_info['breed']}**")
+            st.caption(f"Breed: {query_info['breed']}")
         if query_info["exclude_ids"]:
-            st.caption("The uploaded image is in the gallery. Byte-identical gallery images are excluded.")
-        st.caption("Similarity scores are not probabilities and should not be compared directly across encoders.")
+            st.caption("The query itself is excluded from results.")
 
-    names = settings.model_ids if mode == "Compare all four" else (selected,)
+    names = settings.model_ids if mode == "Compare 4 models" else (selected,)
     signature = (hashlib.sha256(image_bytes).hexdigest(), names)
-    if st.button("Find similar images", type="primary", key="search_button"):
+    if st.button("Search", type="primary", key="search_button"):
         st.session_state.pop("search_run", None)
         results = []
         try:
@@ -166,35 +183,27 @@ def main():
     if current and current["signature"] == signature:
         results = current["results"]
         if len(results) > 1:
-            st.subheader("Same query · same gallery · four encoders")
+            st.subheader("Comparison")
             rows = [{
-                "Model": r["display_name"],
-                "Correct / 5": f"{r['correct']}/5" if r["correct"] is not None else "Unknown breed",
+                "Model": MODEL_LABELS[r["model_id"]],
+                "Correct / 5": f"{r['correct']}/5" if r["correct"] is not None else "—",
                 "Embedding (ms)": round(r["embedding_ms"], 2),
                 "Search (ms)": round(r["search_ms"], 3),
             } for r in results]
             st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
-        for result in results:
+            if st.session_state.get("result_model") not in names:
+                st.session_state["result_model"] = names[0]
+            active = st.radio("View results", names, format_func=MODEL_LABELS.get, horizontal=True, key="result_model")
+            position = names.index(active)
+            previous, counter, following = st.columns([1, 2, 1])
+            previous.button("← Previous", disabled=position == 0, on_click=move_result, args=(-1, names), key="previous_result")
+            counter.caption(f"Model {position + 1} of {len(names)}")
+            following.button("Next →", disabled=position == len(names) - 1, on_click=move_result, args=(1, names), key="next_result")
+            render_result(next(result for result in results if result["model_id"] == active), query_info, settings)
+        else:
             st.divider()
-            render_result(result, query_info, settings)
-
-    with st.expander("Full test-set results"):
-        metrics_path = settings.results / "metrics_test.csv"
-        runtime_path = settings.results / "runtime_summary.csv"
-        metrics = pd.read_csv(metrics_path)
-        display_metrics = metrics[["model", "precision_at_5", "precision_at_10", "recall_at_5", "recall_at_10", "hit_at_5"]].rename(columns={
-            "model": "Model", "precision_at_5": "P@5", "precision_at_10": "P@10",
-            "recall_at_5": "R@5", "recall_at_10": "R@10", "hit_at_5": "Hit@5",
-        })
-        st.dataframe(display_metrics.round(4), hide_index=True, width="stretch")
-        runtime = pd.read_csv(runtime_path)
-        display_runtime = runtime[["model_id", "embed_median_ms", "search_median_ms", "gpu"]].copy()
-        display_runtime["model_id"] = display_runtime["model_id"].map(lambda value: models.get_spec(value).display_name)
-        display_runtime.columns = ["Model", "Embedding (ms)", "Search (ms)", "GPU"]
-        st.dataframe(display_runtime.round(3), hide_index=True, width="stretch")
-        st.caption("Historical benchmark: all 3,669 test queries; latency measured on 200 fixed queries, three repeats, Tesla T4. Live timings above use the current device.")
-        st.write("DINOv2 has the highest test Precision@5, with a larger embedding-time cost. Prepared examples illustrate behavior; aggregate conclusions come from the full test set.")
-        st.caption("Same-breed relevance is a proxy for visual similarity. Different architectures and pretraining data prevent attributing the result to self-supervision alone.")
+            render_result(results[0], query_info, settings)
+        st.caption(f"{settings.device.upper()} · Cosine similarity")
 
 
 if __name__ == "__main__":

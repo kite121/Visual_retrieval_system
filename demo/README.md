@@ -27,9 +27,11 @@ streamlit run demo/app.py
 
 Open the local address printed by Streamlit, normally `http://localhost:8501`.
 
-Choose a prepared example or upload a JPG/PNG image, choose a model or **Compare all four**, then press **Find similar images**. The app shows five images, breed labels, cosine scores, and live preprocessing/embedding/search timings. Known examples additionally show query-level Precision@5. For arbitrary uploads, no breed or quality score is assumed.
+Choose **Example** or **Upload**, select **One model** or **Compare 4 models**, then press **Search**. The mode and model controls are on the main page. The app shows five images, breed labels, similarity scores, and live embedding/search/total timings. Known examples additionally show query-level P@5. For arbitrary uploads, no breed or quality score is assumed.
 
-Model loading is cached and excluded from the displayed timings. The app defaults to offline Hugging Face cache access; run the preparation command before starting it. Live timings use the current CPU/CUDA device. The **Full test-set results** panel separately shows the saved Tesla T4 experiment; its timings are not presented as local measurements. Cosine scores are not calibrated probabilities and should not be compared directly across models.
+In comparison mode, the table summarizes all four models for the current query. Select a model under **View results**, or use **Previous** and **Next**, to browse each Top-5 without rerunning inference. Only one model's images are displayed at a time. Aggregate test-set tables remain in `results/` and are not displayed in the demo.
+
+Model loading is cached and excluded from the displayed timings. Total time includes preprocessing, embedding, and search. The app defaults to offline Hugging Face cache access; run the preparation command before starting it. Live timings use the current CPU/CUDA device. Cosine scores are not calibrated probabilities and should not be compared directly across models.
 
 ## Assets and paths
 
@@ -64,7 +66,7 @@ The default model caches are inside `demo/.cache/`. Existing `TORCH_HOME` or `HF
 
 ## Presentation preparation
 
-Download assets on the actual presentation machine in advance. Run the preparation command with `--verify-models`, start the app, and use **Compare all four** once to warm the app's model caches. The regular search then needs no network access as long as the installed model libraries and cached weights remain available.
+Download assets on the actual presentation machine in advance. Run the preparation command with `--verify-models`, start the app, and use **Compare 4 models** once to warm the app's model caches. The regular search then needs no network access as long as the installed model libraries and cached weights remain available.
 
 Prepared queries belong to the test split and are disjoint from the gallery. Byte-identical gallery images are excluded if a gallery image is uploaded. Recompression, crops, and near-duplicates are not detected as exact duplicates.
 
