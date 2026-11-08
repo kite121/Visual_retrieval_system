@@ -76,7 +76,7 @@ def main() -> None:
     ap.add_argument("--batch-size", type=int, default=None)
     ap.add_argument("--num-workers", type=int, default=None)
     ap.add_argument("--repeats", type=int, default=3)
-    ap.add_argument("--output-dir", default="results/stage3/timing_repeats")
+    ap.add_argument("--output-dir", default="artifacts/timing_measurements")
     ap.add_argument("--summary-dir", default=None, help="also write runtime_summary.csv to this directory")
     args = ap.parse_args()
     if args.repeats < 1:
