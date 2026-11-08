@@ -70,7 +70,8 @@ def main() -> None:
         source = data.image_path(settings.dataset_root, case["image_id"])
         destination = settings.cases_path.parent / case["filename"]
         if source.resolve() != destination.resolve():
-            shutil.copy2(source, destination)
+            shutil.copyfile(source, destination)
+            destination.chmod(0o644)
     missing = service.missing_assets(settings)
     if missing:
         raise ValueError("Missing demo assets:\n" + "\n".join(missing))
