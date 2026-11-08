@@ -25,8 +25,17 @@ st.markdown(
     h1 {font-size: 2.2rem !important;}
     [data-testid="stMetric"] {border: 1px solid rgba(128,128,128,.25); padding: 12px; border-radius: 10px;}
     [data-testid="stMetricValue"] {font-size: 1.6rem;}
+    [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
+    [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p,
+    [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] p {
+        color: inherit !important; opacity: 1 !important;
+    }
+    [data-testid="stWidgetLabel"] p, [data-testid="stMetricLabel"] p {font-weight: 600;}
+    button:disabled {color: inherit !important; opacity: 1 !important; cursor: not-allowed;}
     .st-key-query_preview img {width: 100%; max-height: 220px; object-fit: contain; border-radius: 10px;}
     .st-key-result_grid img {width: 100%; height: 150px; object-fit: contain; border-radius: 8px;}
+    .cosine-score {display: flex; align-items: baseline; gap: .35rem; flex-wrap: wrap; font-size: .75rem; line-height: 1.6;}
+    .cosine-score span, .cosine-score strong {white-space: nowrap;}
     </style>""",
     unsafe_allow_html=True,
 )
@@ -78,8 +87,8 @@ def render_result(result, query_info, settings):
         columns[0].metric("P@5", f"{result['precision_at_5']:.0%}", help="Fraction of Top-5 results with the same breed as the query.")
     else:
         columns[0].metric("Matches", len(result["hits"]))
-    columns[1].metric("Embedding", f"{result['embedding_ms']:.1f} ms")
-    columns[2].metric("Search", f"{result['search_ms']:.2f} ms")
+    columns[1].metric("Embedding", f"{result['embedding_ms']:.1f} ms", help="Time to convert the query image into a normalized feature vector. Excludes preprocessing and model loading.")
+    columns[2].metric("Search", f"{result['search_ms']:.2f} ms", help="Time to compare the query vector with 1,840 gallery vectors and select the Top 5.")
     columns[3].metric("Total", f"{result['total_ms']:.1f} ms", help="Preprocessing + embedding + search. Model loading is excluded.")
     with st.container(key="result_grid"):
         for column, hit in zip(st.columns(5), result["hits"]):
@@ -87,13 +96,13 @@ def render_result(result, query_info, settings):
                 st.image(data.load_image(data.image_path(settings.dataset_root, hit.image_id)), width="stretch")
                 correct = query_info["breed"] and hit.breed == query_info["breed"]
                 marker = ("✅ " if correct else "❌ ") if query_info["breed"] else ""
-                st.markdown(f"**{marker}{hit.breed}**")
-                st.caption(f"#{hit.rank} · Similarity {hit.score:.3f}")
+                st.markdown(f"**#{hit.rank} {marker}{hit.breed}**")
+                st.markdown(f'<div class="cosine-score"><span>Cosine Similarity</span><strong>{hit.score:.3f}</strong></div>', unsafe_allow_html=True)
 
 
 def main():
     st.title("Image Search")
-    st.caption("Oxford-IIIT Pet · 1,840 gallery images")
+    st.markdown("**Oxford-IIIT Pet** · [Dataset website ↗](https://www.robots.ox.ac.uk/~vgg/data/pets/)")
     try:
         settings = service.load_settings()
         cases = service.load_cases(settings)
@@ -112,13 +121,15 @@ def main():
     controls, model_control = st.columns([3, 2], gap="large")
     with controls:
         mode = st.radio("Search mode", ["One model", "Compare 4 models"], horizontal=True, key="search_mode")
-    with model_control:
-        selected = st.selectbox(
-            "Model", settings.model_ids,
-            index=settings.model_ids.index(settings.default_model),
-            format_func=MODEL_LABELS.get,
-            disabled=mode == "Compare 4 models", key="selected_model",
-        )
+    selected = st.session_state.get("preferred_model", settings.default_model)
+    if mode == "One model":
+        with model_control:
+            selected = st.selectbox(
+                "Model", settings.model_ids,
+                index=settings.model_ids.index(selected),
+                format_func=MODEL_LABELS.get, key="selected_model",
+            )
+        st.session_state["preferred_model"] = selected
 
     source = st.radio("Image", ["Example", "Upload"], horizontal=True, key="query_source")
     image_bytes = None
@@ -203,7 +214,6 @@ def main():
         else:
             st.divider()
             render_result(results[0], query_info, settings)
-        st.caption(f"{settings.device.upper()} · Cosine similarity")
 
 
 if __name__ == "__main__":
