@@ -21,8 +21,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--output", default=str(ROOT.parent / "stage3_colab/Visual_retrieval_system_stage3.zip"))
     args = ap.parse_args()
-    paths = [ROOT / name for name in ("README.md", "requirements.txt", "requirements-stage3.txt", ".gitignore")]
-    for folder in ("src", "scripts", "configs", "tests", "notebooks", "docs", "results/first_models"):
+    paths = [ROOT / name for name in ("README.md", "requirements.txt", ".gitignore")]
+    for folder in ("src", "scripts", "configs", "notebooks", "docs", "results/first_models"):
         paths += [p for p in (ROOT / folder).rglob("*") if p.is_file()
                   and "__pycache__" not in p.parts and p.suffix not in (".pyc", ".log")]
     paths = sorted(set(paths))

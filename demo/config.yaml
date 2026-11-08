@@ -1,0 +1,17 @@
+paths:
+  manifest: configs/split_manifest.csv
+  dataset_root: data
+  embeddings_root: demo
+  cases: demo/example_queries/cases.json
+  results: results/02_second_models
+
+models:
+  - dino_vit_s16
+  - deit_vit_s16_supervised
+  - dinov2_vit_b14
+  - deit_vit_b16_supervised
+
+default_model: dinov2_vit_b14
+top_k: 5
+device: auto
+cpu_threads: 4

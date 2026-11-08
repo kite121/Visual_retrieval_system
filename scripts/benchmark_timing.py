@@ -20,7 +20,7 @@ import pandas as pd
 import torch
 import yaml
 
-from visual_retrieval import data, embeddings, models, retrieval, timing
+from src import data, embeddings, models, retrieval, timing
 
 
 def summarize(records: list[dict]) -> pd.DataFrame:

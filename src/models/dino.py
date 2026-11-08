@@ -10,6 +10,8 @@ weights published in ``timm`` (``vit_small_patch16_224.dino``).
 from __future__ import annotations
 
 import warnings
+import os
+from pathlib import Path
 
 import timm
 import torch
@@ -23,6 +25,10 @@ EMBED_DIM = 384
 def _load(pretrained: bool = True) -> nn.Module:
     if not pretrained:
         return timm.create_model("vit_small_patch16_224", pretrained=False, num_classes=0)
+    # Preparation may have used the identical timm fallback when GitHub was down.
+    # Reuse that cached checkpoint without attempting a Hub download during the demo.
+    if os.environ.get("HF_HUB_OFFLINE") == "1" and not (Path(torch.hub.get_dir()) / "facebookresearch_dino_main").is_dir():
+        return timm.create_model("vit_small_patch16_224.dino", pretrained=True, num_classes=0)
     try:
         return torch.hub.load("facebookresearch/dino:main", "dino_vits16", trust_repo=True)
     except Exception as exc:  # network / hub problems -> same weights via timm

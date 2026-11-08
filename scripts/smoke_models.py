@@ -16,7 +16,7 @@ import numpy as np
 import torch
 from PIL import Image
 
-from visual_retrieval import embeddings, models, retrieval, timing
+from src import embeddings, models, retrieval, timing
 
 
 def main() -> None:

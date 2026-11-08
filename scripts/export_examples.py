@@ -14,7 +14,7 @@ import _bootstrap  # noqa: F401
 import numpy as np
 from PIL import Image, ImageDraw, ImageOps
 
-from visual_retrieval import data
+from src import data
 
 
 def main() -> None:

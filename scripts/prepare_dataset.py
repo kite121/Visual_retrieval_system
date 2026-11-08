@@ -12,10 +12,10 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import _bootstrap  # noqa: F401  (adds src/ to sys.path)
+import _bootstrap  # noqa: F401  (adds the repository root to sys.path)
 import yaml
 
-from visual_retrieval import data
+from src import data
 
 REPO_ROOT = _bootstrap.REPO_ROOT
 

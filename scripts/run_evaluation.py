@@ -32,13 +32,13 @@ import json
 import sys
 from pathlib import Path
 
-import _bootstrap  # noqa: F401  (adds src/ to sys.path)
+import _bootstrap  # noqa: F401  (adds the repository root to sys.path)
 import numpy as np
 import pandas as pd
 import torch
 import yaml
 
-from visual_retrieval import data, embeddings, metrics, models, retrieval, timing
+from src import data, embeddings, metrics, models, retrieval, timing
 
 REPO_ROOT = _bootstrap.REPO_ROOT
 

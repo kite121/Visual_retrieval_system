@@ -1,0 +1,58 @@
+[
+  {
+    "id": "successful_search",
+    "title": "Successful search",
+    "image_id": "Abyssinian_224",
+    "filename": "Abyssinian_224.jpg",
+    "breed": "Abyssinian",
+    "description": "All four models retrieve five images of the correct breed.",
+    "expected_correct_top5": {
+      "dino_vit_s16": 5,
+      "deit_vit_s16_supervised": 5,
+      "dinov2_vit_b14": 5,
+      "deit_vit_b16_supervised": 5
+    }
+  },
+  {
+    "id": "model_comparison",
+    "title": "Where DINOv2 helps",
+    "image_id": "Abyssinian_21",
+    "filename": "Abyssinian_21.jpg",
+    "breed": "Abyssinian",
+    "description": "DINOv2 retrieves five Abyssinian images. The other encoders confuse visually similar cat breeds.",
+    "expected_correct_top5": {
+      "dino_vit_s16": 0,
+      "deit_vit_s16_supervised": 1,
+      "dinov2_vit_b14": 5,
+      "deit_vit_b16_supervised": 0
+    }
+  },
+  {
+    "id": "shared_failure",
+    "title": "A shared failure",
+    "image_id": "Siamese_228",
+    "filename": "Siamese_228.jpg",
+    "breed": "Siamese",
+    "description": "All four models miss the correct breed in their Top-5. Birman and Siamese cats can share similar visual features.",
+    "expected_correct_top5": {
+      "dino_vit_s16": 0,
+      "deit_vit_s16_supervised": 0,
+      "dinov2_vit_b14": 0,
+      "deit_vit_b16_supervised": 0
+    }
+  },
+  {
+    "id": "larger_is_not_always_better",
+    "title": "Larger is not always better",
+    "image_id": "leonberger_73",
+    "filename": "leonberger_73.jpg",
+    "breed": "Leonberger",
+    "description": "DeiT-B retrieves Wheaten Terriers, while the other models find mostly or entirely Leonbergers.",
+    "expected_correct_top5": {
+      "dino_vit_s16": 4,
+      "deit_vit_s16_supervised": 5,
+      "dinov2_vit_b14": 5,
+      "deit_vit_b16_supervised": 0
+    }
+  }
+]

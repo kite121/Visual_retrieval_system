@@ -1,9 +1,8 @@
-"""Make ``src/`` importable when scripts are run as ``python scripts/<name>.py``."""
+"""Make the ``src`` package importable when running ``python scripts/<name>.py``."""
 
 import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SRC = str(REPO_ROOT / "src")
-if SRC not in sys.path:
-    sys.path.insert(0, SRC)
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
