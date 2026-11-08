@@ -77,6 +77,13 @@ def build(source=DEFAULT_SOURCE, output=DEFAULT_OUTPUT, manifest="configs/split_
     if (runtime.repeats != meta["timing"]["repeats_per_model"]).any():
         raise ValueError("Repeat count differs from metadata")
     sources.append(runtime_path)
+    previous_failures = {}
+    previous_metadata = output / "run_metadata.json"
+    if previous_metadata.exists() and (output / "failure_cases.csv").exists():
+        previous = json.loads(previous_metadata.read_text(encoding="utf-8"))
+        if previous.get("manifest_sha256") != digest:
+            raise ValueError("Saved failure cases use a different manifest")
+        previous_failures = previous.get("failure_cases", {})
     output.mkdir(parents=True, exist_ok=True)
     quality = pd.concat(tables, ignore_index=True)
     quality.to_csv(output / "final_quality_metrics.csv", index=False)
@@ -85,7 +92,7 @@ def build(source=DEFAULT_SOURCE, output=DEFAULT_OUTPUT, manifest="configs/split_
                 "manifest_sha256": digest, "source_files": [fingerprint(p) for p in sources],
                 "source_run_metadata": meta, "quality_rows": len(quality),
                 "timing_aggregation": "Copied canonical repeated statistics, not legacy stage3 timings",
-                "failure_cases": {"status": "pending"}}
+                "failure_cases": {**previous_failures, "status": "pending"}}
     save_json(output / "run_metadata.json", metadata)
     return quality, runtime
 
