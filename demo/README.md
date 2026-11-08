@@ -43,7 +43,7 @@ demo/
 ├── service.py
 ├── config.yaml
 ├── README.md
-├── demo_script.md
+├── demo_script.md              # optional local presentation notes; ignored by Git
 ├── example_queries/
 │   ├── cases.json
 │   ├── Abyssinian_224.jpg

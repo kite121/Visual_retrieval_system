@@ -10,6 +10,7 @@ data/
 artifacts/
 /demo/embeddings/
 /demo/.cache/
+/demo/demo_script.md
 *.pt
 *.pth
 *.ckpt
