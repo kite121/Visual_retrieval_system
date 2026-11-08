@@ -1,0 +1,565 @@
+{
+  "schema_version": 1,
+  "analysis_utc": "2026-11-08T13:31:53.755371+00:00",
+  "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
+  "source_files": [
+    {
+      "path": "results/02_second_models/run_metadata.json",
+      "sha256": "5c0c4ea39cdd8d1758fa2987fedf716ee10009a5583d665a0957f3b34af28342"
+    },
+    {
+      "path": "configs/split_manifest.csv",
+      "sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80"
+    },
+    {
+      "path": "results/02_second_models/metrics_validation.csv",
+      "sha256": "23bc3e1c1a2e7d6c5182eaca3ae1b2c8a919605b4b9dfee221a65722d56272d6"
+    },
+    {
+      "path": "results/02_second_models/metrics_test.csv",
+      "sha256": "8d3ce92c9eedfb75262c648b86a4af5aa1013c275041f224d4bfacca200d3a08"
+    },
+    {
+      "path": "results/02_second_models/runtime_summary.csv",
+      "sha256": "a6dac58c6ab0922dd0166a47a5534890b2eee199951508b19a5bc05795724c58"
+    }
+  ],
+  "source_run_metadata": {
+    "schema_version": 1,
+    "experiment_id": "02_second_models",
+    "generated_utc": "2026-11-07T18:10:38.085168+00:00",
+    "dataset": {
+      "name": "OxfordIIITPet",
+      "target_type": "category",
+      "seed": 42,
+      "manifest_path": "configs/split_manifest.csv",
+      "manifest_sha256": "82f40e25888189aba46d1c1ff2c74894284c1ff7fa50362026c8abbea0ec9f80",
+      "gallery_fraction_of_trainval": 0.5,
+      "validation_fraction_of_trainval": 0.5,
+      "final_query_split": "test",
+      "sizes": {
+        "gallery": 1840,
+        "validation": 1840,
+        "test": 3669
+      }
+    },
+    "preprocessing": {
+      "resize_short_side": 256,
+      "center_crop": 224,
+      "interpolation": "bicubic",
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    },
+    "retrieval": {
+      "similarity": "cosine",
+      "exclude_query_from_gallery": true,
+      "precision_recall_at_k": [
+        5,
+        10
+      ],
+      "hit_at_k": [
+        5
+      ]
+    },
+    "embedding": {
+      "batch_size": 64,
+      "num_workers": 2,
+      "precision": "fp32"
+    },
+    "timing": {
+      "n_queries": 200,
+      "n_warmup": 10,
+      "search_k": 5,
+      "protocol": {
+        "gallery": "warm file cache; loading, transforms, forward, L2 norm, host transfer; excludes disk save",
+        "embedding": "batch 1; host-to-device transfer, forward and L2 norm; excludes preprocessing",
+        "search": "exact cosine top-5 and transfer of indices to host"
+      },
+      "repeats_per_model": 3,
+      "query_ids": [
+        "american_pit_bull_terrier_30",
+        "yorkshire_terrier_61",
+        "boxer_51",
+        "yorkshire_terrier_73",
+        "Bombay_4",
+        "american_bulldog_64",
+        "english_cocker_spaniel_196",
+        "japanese_chin_70",
+        "Ragdoll_63",
+        "great_pyrenees_91",
+        "german_shorthaired_57",
+        "shiba_inu_48",
+        "german_shorthaired_197",
+        "pomeranian_38",
+        "newfoundland_194",
+        "american_pit_bull_terrier_97",
+        "pomeranian_198",
+        "keeshond_80",
+        "pomeranian_66",
+        "Ragdoll_235",
+        "saint_bernard_191",
+        "pug_27",
+        "Birman_74",
+        "miniature_pinscher_54",
+        "Bengal_33",
+        "Egyptian_Mau_96",
+        "yorkshire_terrier_87",
+        "staffordshire_bull_terrier_33",
+        "german_shorthaired_2",
+        "Bombay_36",
+        "american_bulldog_71",
+        "basset_hound_93",
+        "Maine_Coon_85",
+        "newfoundland_61",
+        "yorkshire_terrier_200",
+        "beagle_28",
+        "keeshond_24",
+        "scottish_terrier_28",
+        "samoyed_36",
+        "Siamese_34",
+        "Sphynx_61",
+        "Maine_Coon_266",
+        "english_cocker_spaniel_36",
+        "samoyed_23",
+        "British_Shorthair_68",
+        "Birman_45",
+        "leonberger_197",
+        "pomeranian_69",
+        "boxer_6",
+        "Birman_200",
+        "Ragdoll_90",
+        "beagle_69",
+        "Sphynx_239",
+        "leonberger_61",
+        "Siamese_233",
+        "keeshond_36",
+        "pomeranian_85",
+        "Egyptian_Mau_212",
+        "havanese_46",
+        "boxer_8",
+        "miniature_pinscher_46",
+        "leonberger_81",
+        "chihuahua_19",
+        "pug_78",
+        "Siamese_44",
+        "British_Shorthair_2",
+        "Bengal_6",
+        "american_pit_bull_terrier_2",
+        "Egyptian_Mau_215",
+        "japanese_chin_191",
+        "havanese_4",
+        "Sphynx_246",
+        "yorkshire_terrier_50",
+        "chihuahua_193",
+        "english_cocker_spaniel_4",
+        "keeshond_54",
+        "beagle_196",
+        "samoyed_63",
+        "Persian_262",
+        "havanese_70",
+        "wheaten_terrier_65",
+        "Sphynx_87",
+        "yorkshire_terrier_44",
+        "miniature_pinscher_52",
+        "english_setter_5",
+        "american_bulldog_37",
+        "Persian_89",
+        "beagle_95",
+        "Bombay_34",
+        "german_shorthaired_38",
+        "Bombay_40",
+        "Persian_28",
+        "german_shorthaired_6",
+        "english_setter_31",
+        "beagle_90",
+        "Siamese_225",
+        "Bombay_59",
+        "Bombay_215",
+        "yorkshire_terrier_68",
+        "saint_bernard_34",
+        "german_shorthaired_86",
+        "american_bulldog_62",
+        "staffordshire_bull_terrier_48",
+        "leonberger_47",
+        "chihuahua_74",
+        "Siamese_81",
+        "miniature_pinscher_39",
+        "Abyssinian_24",
+        "beagle_70",
+        "newfoundland_54",
+        "Maine_Coon_231",
+        "saint_bernard_92",
+        "basset_hound_70",
+        "pug_51",
+        "japanese_chin_96",
+        "wheaten_terrier_51",
+        "beagle_40",
+        "japanese_chin_95",
+        "chihuahua_199",
+        "english_setter_63",
+        "english_cocker_spaniel_54",
+        "keeshond_47",
+        "samoyed_194",
+        "Egyptian_Mau_6",
+        "scottish_terrier_78",
+        "american_bulldog_98",
+        "keeshond_25",
+        "beagle_89",
+        "havanese_90",
+        "Russian_Blue_88",
+        "Ragdoll_258",
+        "shiba_inu_61",
+        "beagle_85",
+        "keeshond_34",
+        "Abyssinian_85",
+        "pomeranian_84",
+        "Sphynx_83",
+        "miniature_pinscher_81",
+        "scottish_terrier_60",
+        "pomeranian_21",
+        "Egyptian_Mau_88",
+        "newfoundland_53",
+        "german_shorthaired_43",
+        "keeshond_56",
+        "chihuahua_67",
+        "Ragdoll_73",
+        "keeshond_191",
+        "pomeranian_96",
+        "wheaten_terrier_63",
+        "basset_hound_3",
+        "Bombay_2",
+        "British_Shorthair_274",
+        "staffordshire_bull_terrier_53",
+        "Bengal_40",
+        "miniature_pinscher_72",
+        "British_Shorthair_44",
+        "pomeranian_94",
+        "leonberger_65",
+        "saint_bernard_24",
+        "english_cocker_spaniel_50",
+        "pomeranian_34",
+        "english_cocker_spaniel_35",
+        "pomeranian_40",
+        "chihuahua_194",
+        "Ragdoll_97",
+        "shiba_inu_203",
+        "Birman_87",
+        "beagle_46",
+        "yorkshire_terrier_25",
+        "german_shorthaired_27",
+        "beagle_93",
+        "scottish_terrier_27",
+        "pug_91",
+        "wheaten_terrier_8",
+        "boxer_64",
+        "newfoundland_72",
+        "Birman_31",
+        "german_shorthaired_54",
+        "Egyptian_Mau_75",
+        "Maine_Coon_50",
+        "yorkshire_terrier_66",
+        "beagle_71",
+        "British_Shorthair_58",
+        "leonberger_25",
+        "japanese_chin_31",
+        "american_bulldog_73",
+        "havanese_6",
+        "leonberger_28",
+        "Sphynx_231",
+        "wheaten_terrier_53",
+        "american_pit_bull_terrier_45",
+        "miniature_pinscher_93",
+        "basset_hound_199",
+        "yorkshire_terrier_52",
+        "Persian_22",
+        "pug_81",
+        "Bengal_201",
+        "havanese_9",
+        "staffordshire_bull_terrier_58",
+        "British_Shorthair_72"
+      ],
+      "model_order": "rotated between repeats",
+      "runtime_summary_source": "three fresh measurements per model after quality evaluation",
+      "latency_aggregation": "median/min/max of the per-repeat median latency",
+      "gallery_aggregation": "median/min/max of the per-repeat gallery build time"
+    },
+    "environment": {
+      "device": "cuda",
+      "python": "3.13.16",
+      "torch": "2.11.0+cu130",
+      "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+      "cpu_count": 4,
+      "gpu": "Tesla T4",
+      "cuda": "13.0",
+      "packages": {
+        "torch": "2.11.0+cu130",
+        "torchvision": "0.26.0+cu130",
+        "timm": "1.0.30",
+        "numpy": "2.1.3",
+        "pandas": "2.3.3",
+        "scikit-learn": "1.6.1",
+        "Pillow": "12.3.0",
+        "PyYAML": "6.0.3"
+      }
+    },
+    "models": [
+      {
+        "model_id": "dino_vit_s16",
+        "display_name": "DINO ViT-S/16",
+        "weights_source": "torch.hub facebookresearch/dino (dino_vits16); fallback timm vit_small_patch16_224.dino",
+        "embedding_dimension": 384,
+        "pretrained": true
+      },
+      {
+        "model_id": "deit_vit_s16_supervised",
+        "display_name": "DeiT-S/16 (supervised)",
+        "weights_source": "timm deit_small_patch16_224 (supervised ImageNet-1k, head removed)",
+        "embedding_dimension": 384,
+        "pretrained": true
+      },
+      {
+        "model_id": "dinov2_vit_b14",
+        "display_name": "DINOv2 ViT-B/14",
+        "weights_source": "torch.hub facebookresearch/dinov2:7764ea0f912e53c92e82eb78a2a1631e92725fc8 (dinov2_vitb14, LVD-142M, no registers)",
+        "embedding_dimension": 768,
+        "pretrained": true
+      },
+      {
+        "model_id": "deit_vit_b16_supervised",
+        "display_name": "DeiT-B/16 (supervised)",
+        "weights_source": "timm deit_base_patch16_224.fb_in1k (supervised ImageNet-1k, head removed)",
+        "embedding_dimension": 768,
+        "pretrained": true
+      }
+    ],
+    "run_id": "20261107T180431Z_a18259",
+    "source_commit": "d514f45ca1878e27fb9d01cf2eed774e82c40a45",
+    "completed_utc": "2026-11-07T18:15:30.217167+00:00",
+    "artifacts": {
+      "rankings_saved": false,
+      "embeddings_archive": "second_models_embeddings.zip",
+      "embedding_splits": [
+        "gallery",
+        "val",
+        "test"
+      ]
+    },
+    "historical_comparison": {
+      "source": "results/stage3/quality/metrics.csv",
+      "values_compared": 40,
+      "max_absolute_difference": 0.0,
+      "tolerance": 1e-06,
+      "within_tolerance": true
+    }
+  },
+  "quality_rows": 8,
+  "timing_aggregation": "Copied canonical repeated statistics, not legacy stage3 timings",
+  "failure_cases": {
+    "status": "complete",
+    "selection": {
+      "split": "test",
+      "k": 5,
+      "selection_method": "Fixed diagnostic examples reviewed in the previous Stage 5 analysis; no model tuning. Three distinct queries across DINO, DINOv2 and DeiT-B. These are illustrative, not a random or representative sample.",
+      "ranking_origin": "Separate full pretrained evaluation on 2026-10-31, GTX 1060 3GB, batch 8. Copied unmodified; full test metrics must agree with canonical 2026-11-07 quality within 1e-6. No timing data from this diagnostic run is used in final runtime_summary.csv.",
+      "cases": [
+        {
+          "query_id": "Abyssinian_21",
+          "observation": "Observed pattern: the query is a sleeping cat photographed closely from the side. Its closed eyes, cheek and muzzle dominate the encoder crop, with little of the upright head outline or body visible. DINO returns two Egyptian Mau images, a Maine Coon, a British Shorthair and a Bengal. Several neighbors also emphasize a cat face rather than a full-body breed profile.",
+          "explanation": "A plausible explanation is reduced access to breed-specific shape cues under this pose and partial view, allowing broad feline facial appearance to dominate the embedding. This is a model-specific difficulty: DINOv2 retrieves five same-breed neighbors for the same query, whereas DINO and DeiT-B retrieve none. The contrast supports using the example to examine representation robustness; it does not prove which feature caused DINO's ranking.",
+          "model_id": "dino_vit_s16"
+        },
+        {
+          "query_id": "Siamese_228",
+          "observation": "Observed pattern: the Siamese-labeled query has a dark face and ears, light surrounding fur and blue eyes. All five DINOv2 neighbors are labeled Birman and show a closely related color-point face pattern. Their cosine similarities are high, including approximately 0.904 for rank one, despite zero breed agreement. All four evaluated encoders have P@5 = 0 for this query.",
+          "explanation": "This case illustrates a fine-grained breed boundary where perceptual resemblance and the label-based relevance rule disagree. Similar face markings and fur appearance plausibly make the Birman images strong visual neighbors. Cosine similarity is not a calibrated probability of a correct breed match. The image and inherited annotation would need an independent review before making any claim of a labeling error; the experiment itself establishes only the observed cross-breed retrieval.",
+          "model_id": "dinov2_vit_b14"
+        },
+        {
+          "query_id": "leonberger_73",
+          "observation": "Observed pattern: a Leonberger-labeled dog is running through grass, with a shaggy coat, a dark muzzle and a less conventional pose than a standing breed portrait. DeiT-B returns five Wheaten Terrier images. Several returned dogs share shaggy facial hair, while most backgrounds differ from the query. This does not support a simple claim that matching grass backgrounds alone explain the failure.",
+          "explanation": "A plausible confusion is that shared coat texture and face appearance outweigh breed-specific proportions in this representation. The photograph provides no calibrated body-size cue, and the running pose changes the visible silhouette. On this exact query, DeiT-S and DINOv2 each retrieve five correct-breed neighbors and DINO retrieves four. The larger supervised model therefore has a specific failure that is not shared by all encoders; a better average score does not guarantee better retrieval for every query.",
+          "model_id": "deit_vit_b16_supervised"
+        }
+      ]
+    },
+    "interpretation": "Diagnostic examples; explanations are hypotheses, not causal findings. Rankings are from a separate verified run, not the canonical timing run.",
+    "metric_tolerance": 1e-06,
+    "test_metric_checks": [
+      {
+        "model_id": "dino_vit_s16",
+        "max_absolute_difference": 0.0,
+        "ranking_run_date": "2026-10-31",
+        "ranking_hardware": {
+          "device": "cuda",
+          "python": "3.12.14",
+          "torch": "2.5.1+cu118",
+          "platform": "Windows-11-10.0.26300-SP0",
+          "cpu_count": 12,
+          "gpu": "NVIDIA GeForce GTX 1060 3GB",
+          "cuda": "11.8"
+        }
+      },
+      {
+        "model_id": "deit_vit_s16_supervised",
+        "max_absolute_difference": 0.0,
+        "ranking_run_date": "2026-10-31",
+        "ranking_hardware": {
+          "device": "cuda",
+          "python": "3.12.14",
+          "torch": "2.5.1+cu118",
+          "platform": "Windows-11-10.0.26300-SP0",
+          "cpu_count": 12,
+          "gpu": "NVIDIA GeForce GTX 1060 3GB",
+          "cuda": "11.8"
+        }
+      },
+      {
+        "model_id": "dinov2_vit_b14",
+        "max_absolute_difference": 0.0,
+        "ranking_run_date": "2026-10-31",
+        "ranking_hardware": {
+          "device": "cuda",
+          "python": "3.12.14",
+          "torch": "2.5.1+cu118",
+          "platform": "Windows-11-10.0.26300-SP0",
+          "cpu_count": 12,
+          "gpu": "NVIDIA GeForce GTX 1060 3GB",
+          "cuda": "11.8"
+        }
+      },
+      {
+        "model_id": "deit_vit_b16_supervised",
+        "max_absolute_difference": 0.0,
+        "ranking_run_date": "2026-10-31",
+        "ranking_hardware": {
+          "device": "cuda",
+          "python": "3.12.14",
+          "torch": "2.5.1+cu118",
+          "platform": "Windows-11-10.0.26300-SP0",
+          "cpu_count": 12,
+          "gpu": "NVIDIA GeForce GTX 1060 3GB",
+          "cuda": "11.8"
+        }
+      }
+    ],
+    "source_files": [
+      {
+        "path": "results/final_analysis_evidence/selection.json",
+        "sha256": "52fbf3a4c1994701828490a4b0d728cbf6d6a0623a56f532957894e6c2d660ba"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/dino_vit_s16/evaluation.json",
+        "sha256": "c89939a834456fe2616e9b8ee3145aceb1e11e28910ad5bc1f12d39710a023f2"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/dino_vit_s16/topk_test.npz",
+        "sha256": "9cbc650292722d99f893503e839883019cffe72b34d1719b412e726786d07354"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/deit_vit_s16_supervised/evaluation.json",
+        "sha256": "e45c690adb476b08f362343fc8592038fe529e23d092d8d70992741d76d99541"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/deit_vit_s16_supervised/topk_test.npz",
+        "sha256": "ac1666095e10c6f5ba46b4be5c660b7776354f580c7e9adbf970e0368ccc83f3"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/dinov2_vit_b14/evaluation.json",
+        "sha256": "8eb7cec38a56e51362a9d6d61f6dc4cda03befe8e6635590d48260bf2a747e19"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/dinov2_vit_b14/topk_test.npz",
+        "sha256": "e17e23d62dc4588f504a43745e5478b09112792c5409e328f6b9e5f7f21b832c"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/deit_vit_b16_supervised/evaluation.json",
+        "sha256": "54d10efa313b39a107f0fab7758b458d336b430ac40deb2c32245cb48030e204"
+      },
+      {
+        "path": "results/final_analysis_evidence/artifacts/runs/deit_vit_b16_supervised/topk_test.npz",
+        "sha256": "68442561b180a1fb06cc02fd029124456ef52222f86ee46889c137e0025bbccc"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Abyssinian_21.jpg",
+        "sha256": "2754d6eef0a78534e238ddf27de23521a3f2edfdc48956acf820e09941dabd03"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Egyptian_Mau_11.jpg",
+        "sha256": "6d655632626888e105a0c7300cbc0cbebac694b5a9e739b4e29e93e78193e275"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Egyptian_Mau_154.jpg",
+        "sha256": "4a949b41e85ccd8a13db30f83985ff49080faf31839e954bbba53a9578745ec4"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Maine_Coon_173.jpg",
+        "sha256": "65fad14212504635520a975b61bef0d88bb19415db7b981fbf2a050b2a4178cf"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/British_Shorthair_182.jpg",
+        "sha256": "44234b27c94dcb7106f9159c5ae0d356b1432deed981807bcb093ecc7b73bd3d"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Bengal_129.jpg",
+        "sha256": "685abbd9eba07c49f792b76d2857b6b60cc40ad5b0321a08ee06abf0397f6d3d"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Siamese_228.jpg",
+        "sha256": "5a9d36de01f793f24ad335988313c8bfa7061818383e47b64a831094855d497c"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Birman_107.jpg",
+        "sha256": "e50b9f945f497fe629c1deb96fb0965ae3db5c23b68f366d73e7b19380f1f121"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Birman_105.jpg",
+        "sha256": "e82f25ff2c64800d5da5228a9c3c8c617051ac2324cbc0cfd97c01bccd14ef38"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Birman_119.jpg",
+        "sha256": "6820b83dfe9d27f54ecb6a56a9eb09aac795d183732972cf6ccede13ca988c78"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Birman_182.jpg",
+        "sha256": "2c1737883ed64c380da079167e57b8dfdd32255f3ec5e284beb622f3a47f4c5f"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/Birman_152.jpg",
+        "sha256": "9b8d8e0dcd2b1705f7898527076031309207e478ca2c0f867e53fb3154fcbf61"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/leonberger_73.jpg",
+        "sha256": "325712c4e448b84ae1a03484861265921423e4f91c65d272894594b24d22a50a"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/wheaten_terrier_158.jpg",
+        "sha256": "10dc94b5f58dcd0e3e60a0e2e1025cd4497eb934d15703d3a8a7eaa3eb899243"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/wheaten_terrier_118.jpg",
+        "sha256": "9bd6bf8caae4368be2d64247ee00968cff9a32806f8477aa8d83a72417ab0cb0"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/wheaten_terrier_181.jpg",
+        "sha256": "157000312f974ae053a8d819bcadabb516524b2a1e1a5aa823f8a1e15897df59"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/wheaten_terrier_13.jpg",
+        "sha256": "9a71ff2cb2a8114446770f2743ec0cb4d79971cd0e56e3d0b801132c218f5952"
+      },
+      {
+        "path": "results/final_analysis_evidence/data/oxford-iiit-pet/images/wheaten_terrier_175.jpg",
+        "sha256": "ea539a3ce74d39a4da1b66779bcf9187a90005ee06e9d13dc0d3fe45c56dc32e"
+      }
+    ]
+  },
+  "analysis_source_commit": "8d431d951c98a9422fda4e6fd6112491368659d5"
+}
