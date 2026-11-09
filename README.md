@@ -15,13 +15,15 @@ The interface supports image uploads, prepared examples, single-model search, an
 | [`demo/`](demo/) | Streamlit interface, prepared examples, screenshot, and setup instructions. |
 | [`notebooks/`](notebooks/) | Three notebooks for model evaluation and final analysis. |
 | [`results/`](results/) | Saved quality metrics, runtime measurements, figures, and failure cases. |
-| [`docs/`](docs/) | Project plan and milestone reports with detailed experimental methodology and findings. |
+| [`docs/`](docs/) | Project plan, milestone reports, and final submission documents. |
 | [`configs/`](configs/) | Shared experiment settings and fixed dataset split. |
 | [`scripts/`](scripts/) | Dataset preparation, evaluation, timing, demo preparation, and final-analysis entry points. |
 | [`src/`](src/) | Shared dataset, model, embedding, retrieval, metric, and timing code. |
 | [`requirements.txt`](requirements.txt) | Combined project dependencies. |
 
 For detailed information about the experiments, see the reports in [`docs/milestones/`](docs/milestones/).
+
+For the final project summary and team contributions, see the [technical summary (PDF)](docs/final/technical_summary.pdf) or its [Word version](docs/final/technical_summary.docx). The [presentation (PowerPoint)](docs/final/presentation.pptx) includes the demo video; a [PDF version](docs/final/presentation.pdf) is also available.
 
 ## Demo and results
 
